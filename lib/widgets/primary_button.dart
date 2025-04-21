@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class PrimaryButton extends StatelessWidget {
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed; // Ubah ke nullable
 
   const PrimaryButton({
     super.key,
@@ -22,7 +22,7 @@ class PrimaryButton extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        onPressed: onPressed,
+        onPressed: onPressed,  // Akan otomatis disabled jika onPressed null
         child: Text(
           label,
           style: const TextStyle(

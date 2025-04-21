@@ -4,6 +4,9 @@ import '../../theme/app_text_styles.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/primary_button.dart';
 import 'home.dart';
+import '../data/services/auth_service.dart';
+import '../data/models/login_request.dart';
+import '../data/models/user_models.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,6 +18,32 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscureText = true;
   bool _rememberMe = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _login() async {
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    final loginRequest = LoginRequest(email: email, password: password);
+
+    final user = await AuthService().login(loginRequest);
+
+    if (user != null) {
+      // Login berhasil, lanjutkan ke Home
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Home(),
+        ),
+      );
+    } else {
+      // Login gagal
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Login gagal, coba lagi!")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +65,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.bottomRight,
                     child: SvgPicture.asset(
                       'assets/svg/Vector (2).svg',
-                      width:
-                          MediaQuery.of(
-                            context,
-                          ).size.width, // Sesuaikan dengan lebar layar
+                      width: MediaQuery.of(
+                        context,
+                      ).size.width, // Sesuaikan dengan lebar layar
                       fit: BoxFit.cover, // Pastikan tidak terdistorsi
                     ),
                   ),
@@ -90,10 +118,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         // Logo/Header
                         Image.asset(
-                          'assets/images/logo.png', // Path ke logo
-                          width: 100, // Menyesuaikan ukuran logo
-                          height: 100, // Menyesuaikan ukuran logo
-                          fit: BoxFit.contain, // Menjaga rasio ukuran logo
+                          'assets/images/logo.png',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.contain,
                         ),
                         const SizedBox(height: 8),
 
@@ -102,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           'HOME SERVICE',
                           style: AppTextStyles.poppinsHeading,
                         ),
-                        const SizedBox(height: 4), // Menjaga jarak lebih dekat
+                        const SizedBox(height: 4),
                         Text(
                           'Please Log in To Continue',
                           style: AppTextStyles.interRegular.copyWith(
@@ -114,9 +142,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         // Username
                         CustomTextField(
-                          hint: 'Username',
+                          controller: _emailController,
+                          hint: 'Email',
                           icon: Image.asset(
-                            'assets/images/img_male_user.png', // Pastikan gambar ada di assets Anda
+                            'assets/images/Letter.png',
                             width: 20,
                             height: 20,
                           ),
@@ -125,9 +154,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         // Password
                         CustomTextField(
+                          controller: _passwordController,
                           hint: 'Password',
                           icon: Image.asset(
-                            'assets/images/img_lock.png', // Pastikan gambar ada di assets Anda
+                            'assets/images/img_lock.png',
                             width: 20,
                             height: 20,
                           ),
@@ -200,14 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 250,
                           child: PrimaryButton(
                             label: 'Login',
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const Home(),
-                                ),
-                              );
-                            },
+                            onPressed: _login,
                           ),
                         ),
 
