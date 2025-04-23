@@ -7,7 +7,8 @@ import '../models/login_request.dart';
 import '../models/user_models.dart';
 
 class AuthService {
-  static const String baseUrl = "http://192.168.137.1:8000/api"; // Pastikan URL benar
+  static const String baseUrl =
+      "http://192.168.150.129:8000/api"; // Pastikan URL benar
 
   // ✅ REGISTER
   Future<bool> register(RegisterRequest request) async {
@@ -54,7 +55,7 @@ class AuthService {
 
         // Simpan token menggunakan shared_preferences
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);  // Menyimpan token
+        await prefs.setString('token', token); // Menyimpan token
 
         print("Login berhasil! Token disimpan.");
 
