@@ -38,21 +38,21 @@ class _OnboardingState extends State<Onboarding> {
   List<Map<String, String>> onboardingData = [
     {
       "image": "assets/images/onboarding1.png",
-      "title": "Monitor Kualitas Udara\nReal-Time",
+      "title": "Layanan Rumah Terpercaya",
       "description":
-          "Pantau tingkat polusi udara, konsentrasi partikel\nberbahaya, dan indeks kualitas udara dengan\nakurat",
+          "Temukan berbagai layanan rumah terbaik mulai dari\npembersihan, perbaikan, hingga renovasi dengan\nharga transparan",
     },
     {
       "image": "assets/images/onboarding2.png",
-      "title": "Lihat Data Kapan Saja",
+      "title": "Pesan Kapan Saja",
       "description":
-          "Akses informasi tentang kualitas udara\ndi sekitar Anda kapan saja dan di mana saja",
+          "Pemesanan layanan rumah kini lebih mudah\ndan dapat dilakukan kapan saja dan di mana saja",
     },
     {
       "image": "assets/images/onboarding3.png",
-      "title": "Solusi untuk Hidup Sehat",
+      "title": "Penyedia Jasa Profesional",
       "description":
-          "Dapatkan rekomendasi terbaik untuk\nmenjaga kesehatan di lingkungan Anda",
+          "Semua penyedia jasa kami telah terverifikasi\ndan berpengalaman di bidangnya masing-masing",
     },
   ];
 
