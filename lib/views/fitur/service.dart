@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// Import the service order summary screen
+import '../fitur dalam/servicespage.dart'; // Adjust this path as needed
 
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({Key? key}) : super(key: key);
@@ -126,7 +128,6 @@ class ServicesScreen extends StatelessWidget {
           ),
         ),
       ),
-      // bottomNavigationBar telah dihapus dari sini
     );
   }
 
@@ -139,10 +140,11 @@ class ServicesScreen extends StatelessWidget {
   ) {
     return InkWell(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$title dipilih'),
-            duration: const Duration(seconds: 1),
+        // Navigate to Service Order Summary page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const ServicePage(),
           ),
         );
       },
