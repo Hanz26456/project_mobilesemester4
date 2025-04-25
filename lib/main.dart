@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:home_service/views/splash_view.dart';
+import 'package:home_service/views/auth/splash_view.dart';
 
 void main() {
   runApp(const MyApp());

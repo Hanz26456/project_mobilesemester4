@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../views/service.dart';
-import '../views/profil.dart';
-import '../views/history.dart';
+import '../fitur/service.dart';
+import '../fitur/profil.dart';
+import '../fitur/history.dart';
 
 void main() {
   runApp(const MyApp());

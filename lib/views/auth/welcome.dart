@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:home_service/utils/colors.dart';
-import 'package:home_service/views/login.dart';
-import 'package:home_service/views/register.dart';
-import '../widgets/primary_button.dart'; // Pastikan import ini ada
+import 'package:home_service/views/auth/login.dart';
+import 'package:home_service/views/auth/register.dart';
+import '../../widgets/primary_button.dart'; // Pastikan import ini ada
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:home_service/utils/colors.dart';
-import 'package:home_service/views/welcome.dart';
-import '../widgets/primary_button.dart'; // ✅ Pastikan ini di-import
+import 'package:home_service/views/auth/welcome.dart';
+import '../../widgets/primary_button.dart'; // ✅ Pastikan ini di-import
 
 class Onboarding extends StatefulWidget {
   const Onboarding({super.key});
