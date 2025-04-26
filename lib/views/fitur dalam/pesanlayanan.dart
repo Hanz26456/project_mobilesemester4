@@ -2,8 +2,75 @@ import 'package:flutter/material.dart';
 // Import your custom button
 import '../../widgets/primary_button.dart';
 
-class ServiceOrderSummary extends StatelessWidget {
+class ServiceOrderSummary extends StatefulWidget {
   const ServiceOrderSummary({Key? key}) : super(key: key);
+
+  @override
+  State<ServiceOrderSummary> createState() => _ServiceOrderSummaryState();
+}
+
+class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
+  // Controllers for text fields
+  final TextEditingController _timeController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
+
+  // Date related state
+  DateTime _selectedDate = DateTime.now();
+  String _formattedDate = 'Pilih tanggal';
+
+  @override
+  void initState() {
+    super.initState();
+    _formatDate(_selectedDate);
+  }
+
+  @override
+  void dispose() {
+    _timeController.dispose();
+    _addressController.dispose();
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  void _formatDate(DateTime date) {
+    setState(() {
+      _selectedDate = date;
+      // Format the date as needed
+      _formattedDate = "${date.day} ${_getMonthName(date.month)} ${date.year}";
+    });
+  }
+
+  String _getMonthName(int month) {
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+    return months[month - 1];
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+
+    if (picked != null && picked != _selectedDate) {
+      _formatDate(picked);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,21 +103,32 @@ class ServiceOrderSummary extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Order details sections
-            _buildOrderDetailRow(
-              title: 'Tanggal',
-              value: '20 April 2025',
-              showArrow: true,
+            // Date picker
+            _buildDatePicker(context),
+            _buildDivider(),
+
+            // Time input field
+            _buildTextField(
+              title: 'Waktu',
+              controller: _timeController,
+              hintText: 'Masukkan waktu (Pagi/Siang/Sore/Malam)',
             ),
             _buildDivider(),
-            _buildOrderDetailRow(title: 'Waktu', value: 'Sore hari'),
-            _buildDivider(),
-            _buildOrderDetailRow(
+
+            // Address input field
+            _buildTextField(
               title: 'Alamat',
-              value: 'Jl. Belok kiri, No 56 Bondowoso',
+              controller: _addressController,
+              hintText: 'Masukkan alamat lengkap',
             ),
             _buildDivider(),
-            _buildOrderDetailRow(title: 'Catatan', value: 'Cepetan bang'),
+
+            // Note input field
+            _buildTextField(
+              title: 'Catatan',
+              controller: _noteController,
+              hintText: 'Tambahkan catatan (opsional)',
+            ),
             _buildDivider(),
 
             const SizedBox(height: 24),
@@ -79,7 +157,6 @@ class ServiceOrderSummary extends StatelessWidget {
 
             const Spacer(),
 
-            // Modified: Use label instead of text
             PrimaryButton(
               label: 'Lanjut Pembayaran',
               onPressed: () {
@@ -93,27 +170,24 @@ class ServiceOrderSummary extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderDetailRow({
-    required String title,
-    required String value,
-    bool showArrow = false,
-  }) {
+  Widget _buildDatePicker(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          const Text(
+            'Tanggal',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
-          Row(
-            children: [
-              Text(
-                value,
-                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-              ),
-              if (showArrow)
+          GestureDetector(
+            onTap: () => _selectDate(context),
+            child: Row(
+              children: [
+                Text(
+                  _formattedDate,
+                  style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                ),
                 const Padding(
                   padding: EdgeInsets.only(left: 4),
                   child: Icon(
@@ -122,7 +196,41 @@ class ServiceOrderSummary extends StatelessWidget {
                     size: 20,
                   ),
                 ),
-            ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required String title,
+    required TextEditingController controller,
+    required String hintText,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: hintText,
+                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                border: InputBorder.none,
+              ),
+              textAlign: TextAlign.right,
+              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+            ),
           ),
         ],
       ),
