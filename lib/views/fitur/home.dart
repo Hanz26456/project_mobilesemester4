@@ -45,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
     _pages = [
       const HomePage(), // Halaman home yang ada sekarang
       const ServicesScreen(), // Import dari service.dart
-      const ProfileScreen(),
       const HistoryScreen(), // Import dari profil.dart
+      const ProfileScreen(),
       const Center(
         child: Text('Halaman Riwayat'),
       ), // Placeholder untuk halaman riwayat
@@ -74,13 +74,13 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
-            label: 'Pesanan',
+            label: 'Layanan',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profil',
+            icon: Icon(Icons.history),
+            label: 'Riwayat',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
+          BottomNavigationBarItem(icon: Icon(Icons.person_outlined), label: 'Profil'),
         ],
       ),
     );
@@ -555,13 +555,10 @@ class HomePage extends StatelessWidget {
   Widget _buildCategoryIconsGrid() {
     List<Map<String, dynamic>> categories = [
       {'title': 'Elektronik', 'icon': Icons.devices},
-      {'title': 'Rumah', 'icon': Icons.home_repair_service},
+      {'title': 'Rumah', 'icon': Icons.yard},
       {'title': 'Mobil', 'icon': Icons.directions_car},
       {'title': 'Perabot', 'icon': Icons.chair},
-      {'title': 'Komputer', 'icon': Icons.computer},
-      {'title': 'Kebun', 'icon': Icons.yard},
-      {'title': 'Kesehatan', 'icon': Icons.medical_services},
-      {'title': 'Kecantikan', 'icon': Icons.face},
+  
     ];
 
     return GridView.builder(

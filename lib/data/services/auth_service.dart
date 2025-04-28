@@ -10,6 +10,7 @@ class AuthService {
   static const String baseUrl =
       "http://192.168.1.8:8000/api"; // Pastikan URL benar
 
+
   // ✅ REGISTER
   Future<bool> register(RegisterRequest request) async {
     final url = Uri.parse('$baseUrl/register');
