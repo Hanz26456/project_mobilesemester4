@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import '../fitur/service.dart';
 import '../fitur/profil.dart';
 import '../fitur/history.dart';
+import '../fitur dalam/notifikasi.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -88,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // Halaman beranda untuk memindahkan konten HomeScreen yang asli
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -115,14 +116,17 @@ class HomePage extends StatelessWidget {
                           size: 28,
                         ),
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Notifikasi diklik'),
-                              duration: Duration(seconds: 1),
+                          // Debug: Periksa apakah navigasi berfungsi
+                          print("Navigasi ke halaman notifikasi");
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const NotifikasiPage(),
                             ),
                           );
                         },
                       ),
+
                       Positioned(
                         right: 8,
                         top: 8,

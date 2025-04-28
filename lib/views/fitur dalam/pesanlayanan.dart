@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import '../../widgets/primary_button.dart';
 
 class ServiceOrderSummary extends StatefulWidget {
-  const ServiceOrderSummary({Key? key}) : super(key: key);
+  const ServiceOrderSummary({super.key});
 
   @override
   State<ServiceOrderSummary> createState() => _ServiceOrderSummaryState();
 }
 
 class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
-  // Controllers for text fields
+  // Controllers
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
 
-  // Date related state
+  // Date state
   DateTime _selectedDate = DateTime.now();
   String _formattedDate = 'Pilih tanggal';
 
@@ -36,25 +36,14 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
   void _formatDate(DateTime date) {
     setState(() {
       _selectedDate = date;
-      // Format the date as needed
       _formattedDate = "${date.day} ${_getMonthName(date.month)} ${date.year}";
     });
   }
 
   String _getMonthName(int month) {
     const months = [
-      'Januari',
-      'Februari',
-      'Maret',
-      'April',
-      'Mei',
-      'Juni',
-      'Juli',
-      'Agustus',
-      'September',
-      'Oktober',
-      'November',
-      'Desember',
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
     ];
     return months[month - 1];
   }
@@ -66,7 +55,6 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
-
     if (picked != null && picked != _selectedDate) {
       _formatDate(picked);
     }
@@ -79,14 +67,11 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: Container(
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.black, width: 2),
-          ),
-          child: const Icon(Icons.arrow_back, color: Colors.black),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // <-- Ini bener untuk kembali
+          },
         ),
         title: const Text(
           'Pesan Layanan',
@@ -103,37 +88,27 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Date picker
             _buildDatePicker(context),
             _buildDivider(),
-
-            // Time input field
             _buildTextField(
               title: 'Waktu',
               controller: _timeController,
               hintText: 'Masukkan waktu (Pagi/Siang/Sore/Malam)',
             ),
             _buildDivider(),
-
-            // Address input field
             _buildTextField(
               title: 'Alamat',
               controller: _addressController,
               hintText: 'Masukkan alamat lengkap',
             ),
             _buildDivider(),
-
-            // Note input field
             _buildTextField(
               title: 'Catatan',
               controller: _noteController,
               hintText: 'Tambahkan catatan (opsional)',
             ),
             _buildDivider(),
-
             const SizedBox(height: 24),
-
-            // Price summary section
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -154,13 +129,11 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
                 ],
               ),
             ),
-
             const Spacer(),
-
             PrimaryButton(
               label: 'Lanjut Pembayaran',
               onPressed: () {
-                // Handle button press
+                // Nanti isi action lanjut pembayaran disini
               },
             ),
             const SizedBox(height: 16),
@@ -188,14 +161,7 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
                   _formattedDate,
                   style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 4),
-                  child: Icon(
-                    Icons.chevron_right,
-                    color: Colors.grey,
-                    size: 20,
-                  ),
-                ),
+                const Icon(Icons.chevron_right, color: Colors.grey, size: 20),
               ],
             ),
           ),

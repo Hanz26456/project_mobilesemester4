@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../fitur dalam/servicespage.dart'; // Adjust this path as needed
 
 class ServicesScreen extends StatelessWidget {
-  const ServicesScreen({Key? key}) : super(key: key);
+  const ServicesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
