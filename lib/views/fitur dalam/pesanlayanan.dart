@@ -1,27 +1,40 @@
 import 'package:flutter/material.dart';
-// Import your custom button
 import '../../widgets/primary_button.dart';
+import '../../data/models/order_request.dart';
+import '../../data/services/order_service.dart';
 
 class ServiceOrderSummary extends StatefulWidget {
-  const ServiceOrderSummary({super.key});
+  final int userId;
+  final int serviceId;
+  final int price;
+  final int initialQuantity;
+
+  const ServiceOrderSummary({
+    super.key,
+    required this.userId,
+    required this.serviceId,
+    required this.price,
+    this.initialQuantity = 1, // default quantity
+  });
 
   @override
   State<ServiceOrderSummary> createState() => _ServiceOrderSummaryState();
 }
 
 class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
-  // Controllers
   final TextEditingController _timeController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
+  int _quantity = 1;
+  String _paymentMethod = 'tunai'; // Default payment method
 
-  // Date state
   DateTime _selectedDate = DateTime.now();
   String _formattedDate = 'Pilih tanggal';
 
   @override
   void initState() {
     super.initState();
+    _quantity = widget.initialQuantity;
     _formatDate(_selectedDate);
   }
 
@@ -60,6 +73,74 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
     }
   }
 
+  Future<void> _submitOrder() async {
+    if (_quantity <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Jumlah layanan tidak valid")),
+      );
+      return;
+    }
+
+    final order = OrderRequest(
+      userId: widget.userId,
+      tanggalPemesanan: _selectedDate.toIso8601String(),
+      metodePembayaran: _paymentMethod, // Menggunakan metode pembayaran yang dipilih
+      services: [
+        OrderServiceItem(
+          serviceId: widget.serviceId,
+          quantity: _quantity,
+          price: widget.price,
+        )
+      ],
+    );
+
+    final success = await OrderService.createOrder(order);
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Pemesanan berhasil!")),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Gagal melakukan pemesanan")),
+      );
+    }
+  }
+
+  // Method untuk memilih metode pembayaran
+  Widget _buildPaymentMethodSelector() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Metode Pembayaran',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+          DropdownButton<String>(
+            value: _paymentMethod,
+            items: const [
+              DropdownMenuItem<String>(
+                value: 'tunai',
+                child: Text('Tunai'),
+              ),
+              DropdownMenuItem<String>(
+                value: 'non-tunai',
+                child: Text('Non-Tunai'),
+              ),
+            ],
+            onChanged: (String? newValue) {
+              setState(() {
+                _paymentMethod = newValue!;
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,17 +150,11 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context); // <-- Ini bener untuk kembali
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Pesan Layanan',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         centerTitle: true,
       ),
@@ -90,23 +165,9 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
           children: [
             _buildDatePicker(context),
             _buildDivider(),
-            _buildTextField(
-              title: 'Waktu',
-              controller: _timeController,
-              hintText: 'Masukkan waktu (Pagi/Siang/Sore/Malam)',
-            ),
+            _buildQuantitySelector(),
             _buildDivider(),
-            _buildTextField(
-              title: 'Alamat',
-              controller: _addressController,
-              hintText: 'Masukkan alamat lengkap',
-            ),
-            _buildDivider(),
-            _buildTextField(
-              title: 'Catatan',
-              controller: _noteController,
-              hintText: 'Tambahkan catatan (opsional)',
-            ),
+            _buildPaymentMethodSelector(), // Menambahkan dropdown untuk metode pembayaran
             _buildDivider(),
             const SizedBox(height: 24),
             Container(
@@ -117,24 +178,22 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
+                children: [
+                  const Text(
                     'Ringkasan Ongkosan',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'Rp. 150.000',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    'Rp. ${widget.price * _quantity}',  // Total harga berdasarkan quantity
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
             ),
             const Spacer(),
             PrimaryButton(
-              label: 'Lanjut Pembayaran',
-              onPressed: () {
-                // Nanti isi action lanjut pembayaran disini
-              },
+              label: 'Lakukan Pemesanan',
+              onPressed: _submitOrder,
             ),
             const SizedBox(height: 16),
           ],
@@ -170,33 +229,39 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
     );
   }
 
-  Widget _buildTextField({
-    required String title,
-    required TextEditingController controller,
-    required String hintText,
-  }) {
+  Widget _buildQuantitySelector() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          const Text(
+            'Jumlah',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: TextField(
-              controller: controller,
-              decoration: InputDecoration(
-                hintText: hintText,
-                hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
-                contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                border: InputBorder.none,
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.remove),
+                onPressed: () {
+                  setState(() {
+                    if (_quantity > 1) _quantity--;
+                  });
+                },
               ),
-              textAlign: TextAlign.right,
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
-            ),
+              Text(
+                _quantity.toString(),
+                style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  setState(() {
+                    _quantity++;
+                  });
+                },
+              ),
+            ],
           ),
         ],
       ),

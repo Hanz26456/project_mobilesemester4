@@ -1,69 +1,78 @@
 import 'package:flutter/material.dart';
+import '../../data/services/history_service.dart'; // ganti dengan file tempat kamu taruh fetchUserOrders
+import '../../data/models/order_response.dart';   // file model OrderResponse kamu
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HistoryScreen extends StatelessWidget {
+class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
+
+  @override
+  State<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  late Future<List<OrderResponse>> futureOrders;
+
+  int? userId;
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserAndFetch();
+  }
+
+  void loadUserAndFetch() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedUserId = prefs.getInt('user_id');
+    setState(() {
+      userId = savedUserId;
+      futureOrders = fetchUserOrders(savedUserId ?? 0);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header title
-                const Center(
-                  child: Text(
-                    'Riwayat',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 24),
+        child: userId == null
+            ? const Center(child: CircularProgressIndicator())
+            : FutureBuilder<List<OrderResponse>>(
+                future: futureOrders,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Gagal memuat riwayat'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('Tidak ada riwayat pesanan.'));
+                  }
 
-                // History Items
-                _buildHistoryItem(
-                  context,
-                  'AC Service',
-                  '20 April 2025, 10.45',
-                  '10 April 2025',
-                  'Process',
-                ),
-                const SizedBox(height: 16),
+                  final orders = snapshot.data!;
+                  return ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: orders.length,
+                    itemBuilder: (context, index) {
+                      final order = orders[index];
+                      final firstService = order.orderDetails.isNotEmpty
+                          ? order.orderDetails.first.service.name
+                          : 'Layanan Tidak Diketahui';
 
-                _buildHistoryItem(
-                  context,
-                  'Cleaning',
-                  '20 April 2025, 10.45',
-                  '10 April 2025',
-                  'Pending',
-                ),
-                const SizedBox(height: 16),
-
-                _buildHistoryItem(
-                  context,
-                  'Tukang Kebun',
-                  '20 April 2025, 10.45',
-                  '10 April 2025',
-                  'Process',
-                ),
-                const SizedBox(height: 16),
-
-                _buildHistoryItem(
-                  context,
-                  'Ular Dalam Parit',
-                  '20 April 2025, 10.45',
-                  '10 April 2025',
-                  'Done',
-                ),
-
-                // Dummy space at bottom for better scrolling experience
-                const SizedBox(height: 24),
-              ],
-            ),
-          ),
-        ),
+                      return Column(
+                        children: [
+                          _buildHistoryItem(
+                            context,
+                            firstService,
+                            '${order.tanggalPemesanan}, 10.45',
+                            order.tanggalPemesanan,
+                            order.status,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
       ),
     );
   }
@@ -75,7 +84,6 @@ class HistoryScreen extends StatelessWidget {
     String orderDate,
     String status,
   ) {
-    // Menentukan warna status berdasarkan nilai status
     Color statusColor;
     Color textColor = Colors.black;
 
@@ -144,10 +152,7 @@ class HistoryScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
                   color: statusColor,
                   borderRadius: BorderRadius.circular(20),
