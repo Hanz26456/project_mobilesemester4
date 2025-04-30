@@ -122,7 +122,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ServicePage(service: service),
+            builder: (context) => ServicePage(
+              service: service,
+              userId: 1, // Ganti dengan userId sebenarnya
+            ),
           ),
         );
       },

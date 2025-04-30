@@ -5,8 +5,9 @@ import '../fitur dalam/pesanlayanan.dart';
 
 class ServicePage extends StatelessWidget {
   final ServiceModel service;
+  final int userId;
 
-  const ServicePage({Key? key, required this.service}) : super(key: key);
+  const ServicePage({super.key, required this.service, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,9 @@ class ServicePage extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         title: const Text(
           'Pesan Layanan',
@@ -37,28 +40,28 @@ class ServicePage extends StatelessWidget {
               const SizedBox(height: 20),
               service.imageAsset.startsWith('http')
                   ? ClipOval(
-                      child: Image.network(
-                        service.imageAsset,
-                        width: 120,
-                        height: 120,
-                        fit: BoxFit.cover,
-                      ),
-                    )
-                  : Container(
+                    child: Image.network(
+                      service.imageAsset,
                       width: 120,
                       height: 120,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFE0E0E0),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.air,
-                          size: 60,
-                          color: Colors.green[800],
-                        ),
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                  : Container(
+                    width: 120,
+                    height: 120,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFE0E0E0),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.air,
+                        size: 60,
+                        color: Colors.green[800],
                       ),
                     ),
+                  ),
               const SizedBox(height: 20),
               Text(
                 service.name,
@@ -108,10 +111,14 @@ class ServicePage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ServiceOrderSummary(
-                        serviceId: service.id,
-                        price: service.price.toInt(),
-                      ),
+                      builder:
+                          (context) => ServiceOrderSummary(
+                            userId: userId,
+                            serviceId: service.id,
+                            price:
+                                service.price
+                                    .toInt(), // Mengonversi price menjadi int
+                          ),
                     ),
                   );
                 },

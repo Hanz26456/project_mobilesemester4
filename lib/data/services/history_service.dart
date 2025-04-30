@@ -1,18 +1,19 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../data/models/order_response.dart'; // Sesuaikan path model
+import 'config.dart';
 
 Future<List<OrderResponse>> fetchUserOrders(int userId) async {
+  
   final response = await http.get(
-    Uri.parse('http://192.168.1.6:8000/api/orders/user/$userId'),
+    Uri.parse('${Config.baseUrl}/orders/user/$userId'),
   );
 
   if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    return (data['data'] as List)
-        .map((json) => OrderResponse.fromJson(json))
-        .toList();
+    final jsonData = json.decode(response.body);
+    final List<dynamic> orders = jsonData['data'];
+    return orders.map((e) => OrderResponse.fromJson(e)).toList();
   } else {
-    throw Exception('Failed to load orders');
+    throw Exception('Gagal memuat data riwayat pesanan');
   }
 }
