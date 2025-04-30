@@ -4,7 +4,7 @@ import '../../data/models/service_model.dart'; // Sesuaikan path model
 
 class ServiceService {
   static const String baseUrl =
-      "http://192.168.1.6:8000/api"; // Ganti dengan URL API Anda
+      "http://192.168.1.8:8000/api"; // Ganti dengan URL API Anda
 
   static Future<List<ServiceModel>> getAllServices() async {
     final response = await http.get(Uri.parse('$baseUrl/services'));

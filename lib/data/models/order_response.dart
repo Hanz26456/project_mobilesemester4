@@ -24,6 +24,11 @@ class OrderResponse {
           .toList(),
     );
   }
+
+  @override
+  String toString() {
+    return 'Order(id: $id, tanggal: $tanggalPemesanan, status: $status, details: $orderDetails)';
+  }
 }
 
 class OrderDetailResponse {
@@ -50,6 +55,11 @@ class OrderDetailResponse {
       service: Service.fromJson(json['service']),
     );
   }
+
+  @override
+  String toString() {
+    return 'Detail(serviceId: $serviceId, quantity: $quantity, service: $service)';
+  }
 }
 
 class Service {
@@ -58,6 +68,11 @@ class Service {
   Service({required this.name});
 
   factory Service.fromJson(Map<String, dynamic> json) {
-    return Service(name: json['nama_service']);
+    return Service(name: json['name']); // ✅ perbaikan di sini
+  }
+
+  @override
+  String toString() {
+    return 'Service(name: $name)';
   }
 }
