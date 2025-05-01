@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../fitur/service.dart';
 import '../fitur/profil.dart';
 import '../fitur/history.dart';
 import '../fitur dalam/notifikasi.dart';
+import '../../data/services/service_service.dart';
+import '../../data/models/service_model.dart';
+import '../../data/services/auth_service.dart'; // Import AuthService
+import '../../data/models/user_models.dart'; // Import UserModel sesuai dengan struktur Anda
 
 void main() {
   runApp(const MyApp());
@@ -34,26 +40,23 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0; // Untuk menyimpan indeks halaman yang aktif
-
-  // List halaman yang akan ditampilkan
+  int _selectedIndex = 0;
   late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
     _pages = [
-      const HomePage(), // Halaman home yang ada sekarang
-      const ServicesScreen(), // Import dari service.dart
-      const HistoryScreen(), // Import dari profil.dart
+      const HomePage(),
+      const ServicesScreen(),
+      const HistoryScreen(),
       const ProfileScreen(),
       const Center(
         child: Text('Halaman Riwayat'),
-      ), // Placeholder untuk halaman riwayat
+      ),
     ];
   }
 
-  // Fungsi untuk mengganti halaman
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -63,12 +66,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex], // Tampilkan halaman sesuai indeks
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.teal,
         unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex, // Gunakan _selectedIndex
-        onTap: _onItemTapped, // Tambahkan fungsi onTap
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
@@ -76,424 +79,466 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.calendar_today),
             label: 'Layanan',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Riwayat',
+            icon: Icon(Icons.person_outlined),
+            label: 'Profil',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outlined), label: 'Profil'),
         ],
       ),
     );
   }
 }
 
-// Halaman beranda untuk memindahkan konten HomeScreen yang asli
-class HomePage extends StatelessWidget {
+// Halaman beranda dengan data dari API
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header with Notification Icon
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Halo, Jamal',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  Stack(
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.notifications_outlined,
-                          size: 28,
-                        ),
-                        onPressed: () {
-                          // Debug: Periksa apakah navigasi berfungsi
-                          print("Navigasi ke halaman notifikasi");
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const NotifikasiPage(),
-                            ),
-                          );
-                        },
-                      ),
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  List<ServiceModel> popularServices = [];
+  bool isLoadingPopular = false;
+  
+  // Tambahkan untuk user
+  UserModel? currentUser;
+  bool isLoadingUser = false;
+  final AuthService _authService = AuthService(); // Instansiasi AuthService
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPopularServices();
+    fetchCurrentUser(); // Panggil fungsi untuk fetch data user
+  }
+
+  // Fungsi untuk mengambil data user yang login
+  Future<void> fetchCurrentUser() async {
+    setState(() => isLoadingUser = true);
+    try {
+      // Ambil data user dari SharedPreferences yang disimpan saat login
+      final prefs = await SharedPreferences.getInstance();
+      String? userJson = prefs.getString('user_data');
+      
+      if (userJson != null) {
+        Map<String, dynamic> userData = json.decode(userJson);
+        setState(() {
+          currentUser = UserModel.fromJson(userData);
+        });
+      }
+    } catch (e) {
+      print('Error fetching current user: $e');
+    }
+    setState(() => isLoadingUser = false);
+  }
+
+  Future<void> fetchPopularServices() async {
+    setState(() => isLoadingPopular = true);
+    try {
+      List<ServiceModel> allServices = await ServiceService.getAllServices();
+      setState(() {
+        popularServices = allServices.take(5).toList();
+      });
+    } catch (e) {
+      print('Error fetching popular services: $e');
+    }
+    setState(() => isLoadingPopular = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await fetchPopularServices();
+            await fetchCurrentUser(); // Refresh juga data user
+          },
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with Notification Icon - Diganti dengan nama user yang login
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      isLoadingUser
+                          ? const SizedBox(
+                              width: 150,
+                              child: Text(
+                                'Memuat...',
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            )
+                          : Text(
+                              'Halo, ${currentUser?.username ?? 'Pengguna'}',
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                      Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.notifications_outlined,
+                              size: 28,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const NotifikasiPage(),
+                                ),
+                              );
+                            },
+                          ),
+                          Positioned(
+                            right: 8,
+                            top: 8,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: const Text(
+                                '3',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Search bar
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Cari Layanan',
+                        prefixIcon: const Icon(Icons.search),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // Enhanced Promo Banner
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Colors.teal.shade700,
+                              Colors.teal.shade500,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.teal.withOpacity(0.3),
+                              spreadRadius: 2,
+                              blurRadius: 8,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Text(
+                                      'PROMO SPESIAL',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.teal,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Text(
+                                    'Digital Season diskon 26%',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    children: const [
+                                      Icon(
+                                        Icons.calendar_today,
+                                        color: Colors.white70,
+                                        size: 14,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Khusus bulan ini',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.local_offer,
+                                color: Colors.white,
+                                size: 50,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                          ],
+                        ),
+                      ),
                       Positioned(
                         right: 8,
-                        top: 8,
+                        top: 40,
                         child: Container(
-                          padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: const Text(
-                            '3',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.arrow_forward,
+                              color: Colors.teal,
                             ),
-                            textAlign: TextAlign.center,
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Promo diklik'),
+                                  duration: Duration(seconds: 1),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Search bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(30),
                 ),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Cari Layanan',
-                    prefixIcon: const Icon(Icons.search),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 15),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
+                const SizedBox(height: 24),
 
-            // Enhanced Promo Banner
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Stack(
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Colors.teal.shade700, Colors.teal.shade500],
+                // Layanan Populer Header
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Layanan Populer',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.teal.withOpacity(0.3),
-                          spreadRadius: 2,
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Text(
-                                  'PROMO SPESIAL',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.teal,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              const Text(
-                                'Digital Season diskon 26%',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: const [
-                                  Icon(
-                                    Icons.calendar_today,
-                                    color: Colors.white70,
-                                    size: 14,
-                                  ),
-                                  SizedBox(width: 4),
-                                  Text(
-                                    'Khusus bulan ini',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: 100,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.local_offer,
-                            color: Colors.white,
-                            size: 50,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    right: 8,
-                    top: 40,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.arrow_forward,
-                          color: Colors.teal,
-                        ),
+                      TextButton(
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Promo diklik'),
-                              duration: Duration(seconds: 1),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ServicesScreen(),
                             ),
                           );
                         },
+                        child: const Text('Lihat Semua'),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Layanan Populer Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Layanan Populer',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Lihat Semua diklik'),
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
-                    },
-                    child: const Text('Lihat Semua'),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Layanan Populer Cards - Horizontal Scrollable
-            SizedBox(
-              height: 160,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  _buildServiceCardScrollable(
-                    'AC Service',
-                    'Rp. 150.000',
-                    Icons.ac_unit,
-                  ),
-                  const SizedBox(width: 12),
-                  _buildServiceCardScrollable(
-                    'Cleaning Service',
-                    'Rp. 150.000',
-                    Icons.cleaning_services,
-                  ),
-                  const SizedBox(width: 12),
-                  _buildServiceCardScrollable(
-                    'Perbaikan TV',
-                    'Rp. 200.000',
-                    Icons.tv,
-                  ),
-                  const SizedBox(width: 12),
-                  _buildServiceCardScrollable(
-                    'Tukang Ledeng',
-                    'Rp. 100.000',
-                    Icons.plumbing,
-                  ),
-                  const SizedBox(width: 12),
-                  _buildServiceCardScrollable(
-                    'Tukang Listrik',
-                    'Rp. 120.000',
-                    Icons.electrical_services,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Kategori Layanan Header
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Kategori Layanan',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Kategori Icons
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _buildCategoryIconsGrid(),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Layanan Terdekat Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Layanan Terdekat',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Lihat Peta diklik'),
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
-                    },
-                    child: Row(
-                      children: const [
-                        Text('Lihat Peta'),
-                        SizedBox(width: 4),
-                        Icon(Icons.map, size: 16),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Layanan Terdekat List
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: _buildNearbyServicesList(),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Testimonial Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade300),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Testimonial Pelanggan',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                const SizedBox(height: 16),
+
+                // Layanan Populer Cards - Horizontal Scrollable dari API
+                SizedBox(
+                  height: 160,
+                  child:
+                      isLoadingPopular
+                          ? const Center(child: CircularProgressIndicator())
+                          : popularServices.isEmpty
+                          ? const Center(
+                            child: Text('Tidak ada layanan populer'),
+                          )
+                          : ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: popularServices.length,
+                            itemBuilder: (context, index) {
+                              final service = popularServices[index];
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  right:
+                                      index != popularServices.length - 1
+                                          ? 12
+                                          : 0,
+                                ),
+                                child: _buildServiceCardFromAPI(service),
+                              );
+                            },
                           ),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Semua Testimonial diklik'),
-                                duration: Duration(seconds: 1),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Kategori Layanan Header
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    'Kategori Layanan',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Kategori Icons
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _buildCategoryIconsGrid(),
+                ),
+
+                const SizedBox(height: 24),
+                // Testimonial Section
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Testimonial Pelanggan',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
-                            );
-                          },
-                          child: const Text('Semua'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Semua Testimonial diklik'),
+                                    duration: Duration(seconds: 1),
+                                  ),
+                                );
+                              },
+                              child: const Text('Semua'),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        _buildTestimonialItem(
+                          'Ahmad Fauzi',
+                          'Layanan cepat dan teknisi sangat ramah!',
+                          4.5,
+                        ),
+                        const Divider(),
+                        _buildTestimonialItem(
+                          'Siti Mariam',
+                          'AC saya jadi dingin kembali, terima kasih!',
+                          5.0,
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    _buildTestimonialItem(
-                      'Ahmad Fauzi',
-                      'Layanan cepat dan teknisi sangat ramah!',
-                      4.5,
-                    ),
-                    const Divider(),
-                    _buildTestimonialItem(
-                      'Siti Mariam',
-                      'AC saya jadi dingin kembali, terima kasih!',
-                      5.0,
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 24),
+              ],
             ),
-            const SizedBox(height: 24),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildServiceCardScrollable(
-    String title,
-    String price,
-    IconData icon,
-  ) {
+  // Widget untuk menampilkan kartu layanan dari API
+  Widget _buildServiceCardFromAPI(ServiceModel service) {
+    // Tentukan icon berdasarkan nama layanan atau gunakan icon default
+    IconData serviceIcon = Icons.build;
+
+    // Cek nama layanan dan tentukan icon yang sesuai
+    if (service.name.toLowerCase().contains('ac')) {
+      serviceIcon = Icons.ac_unit;
+    } else if (service.name.toLowerCase().contains('clean')) {
+      serviceIcon = Icons.cleaning_services;
+    } else if (service.name.toLowerCase().contains('tv')) {
+      serviceIcon = Icons.tv;
+    } else if (service.name.toLowerCase().contains('ledeng') ||
+        service.name.toLowerCase().contains('air')) {
+      serviceIcon = Icons.plumbing;
+    } else if (service.name.toLowerCase().contains('listrik')) {
+      serviceIcon = Icons.electrical_services;
+    }
+
     return Container(
       width: 140,
       decoration: BoxDecoration(
@@ -527,11 +572,28 @@ class HomePage extends StatelessWidget {
                   ),
                 ],
               ),
-              child: Icon(icon, size: 30, color: Colors.teal),
+              child:
+                  service.imageAsset.isNotEmpty
+                      ? ClipOval(
+                        child: Image.network(
+                          service.imageAsset,
+                          width: 60,
+                          height: 60,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              serviceIcon,
+                              size: 30,
+                              color: Colors.teal,
+                            );
+                          },
+                        ),
+                      )
+                      : Icon(serviceIcon, size: 30, color: Colors.teal),
             ),
             const SizedBox(height: 12),
             Text(
-              title,
+              service.name,
               style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
               maxLines: 1,
@@ -539,7 +601,7 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              price,
+              'Rp ${service.price}',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
@@ -558,7 +620,6 @@ class HomePage extends StatelessWidget {
       {'title': 'Rumah', 'icon': Icons.yard},
       {'title': 'Mobil', 'icon': Icons.directions_car},
       {'title': 'Perabot', 'icon': Icons.chair},
-  
     ];
 
     return GridView.builder(
@@ -615,91 +676,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildNearbyServicesList() {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          _buildNearbyServiceItem(
-            'Renovasi Rumah',
-            '0,5 km',
-            Icons.home_work,
-            4.8,
-          ),
-          const Divider(height: 1),
-          _buildNearbyServiceItem(
-            'Servis Kulkas',
-            '1,2 km',
-            Icons.kitchen,
-            4.5,
-          ),
-          const Divider(height: 1),
-          _buildNearbyServiceItem(
-            'Perbaikan Motor',
-            '1,8 km',
-            Icons.motorcycle,
-            4.6,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNearbyServiceItem(
-    String title,
-    String distance,
-    IconData icon,
-    double rating,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.teal.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: Colors.teal),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                Row(
-                  children: [
-                    const Icon(Icons.star, size: 16, color: Colors.amber),
-                    Text(
-                      ' $rating',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Text(
-            distance,
-            style: TextStyle(color: Colors.grey[600], fontSize: 14),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildTestimonialItem(String name, String comment, double rating) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -739,3 +715,4 @@ class HomePage extends StatelessWidget {
     );
   }
 }
+

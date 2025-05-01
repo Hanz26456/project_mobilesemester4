@@ -8,8 +8,7 @@ import '../models/user_models.dart';
 
 class AuthService {
   static const String baseUrl =
-      "http://192.168.1.8:8000/api"; // Pastikan URL benar
-
+      "http://192.168.1.6:8000/api"; // Pastikan URL benar
 
   // ✅ REGISTER
   Future<bool> register(RegisterRequest request) async {
@@ -53,15 +52,19 @@ class AuthService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final token = data['token'];
+        final userData = data['user'];
 
-        // Simpan token menggunakan shared_preferences
+        // Simpan token dan data user menggunakan shared_preferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('token', token); // Menyimpan token
 
-        print("Login berhasil! Token disimpan.");
+        // Simpan data user sebagai JSON string
+        await prefs.setString('user_data', json.encode(userData));
+
+        print("Login berhasil! Token dan data user disimpan.");
 
         // Mengembalikan UserModel dengan data pengguna yang login
-        return UserModel.fromJson(data['user']);
+        return UserModel.fromJson(userData);
       } else {
         final data = json.decode(response.body);
         print("Login gagal: ${data['message'] ?? 'Unknown error'}");

@@ -4,7 +4,7 @@ import '../../data/models/order_response.dart'; // Sesuaikan path model
 
 Future<List<OrderResponse>> fetchUserOrders(int userId) async {
   final response = await http.get(
-    Uri.parse('http://192.168.1.8:8000/api/orders/user/$userId'),
+    Uri.parse('http://192.168.1.6:8000/api/orders/user/$userId'),
   );
 
   if (response.statusCode == 200) {
