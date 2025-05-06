@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../auth/login.dart';
 import '../fitur dalam/changepassword.dart';
 import '../fitur dalam/editprofil.dart';
+import '../fitur dalam/aboutapp.dart';
+import '../fitur dalam/pusatbantuan.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -87,24 +89,14 @@ class ProfileScreen extends StatelessWidget {
 
                 _buildMenuItem(
                   context,
-                  'Alamat Saya',
-                  Icons.location_on_outlined,
-                  () {
-                    // Navigate to addresses
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Alamat Saya diklik')),
-                    );
-                  },
-                ),
-
-                _buildMenuItem(
-                  context,
                   'Pusat Bantuan',
                   Icons.help_outline,
                   () {
-                    // Navigate to help center
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Pusat Bantuan diklik')),
+                     Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HelpCenterScreen(),
+                   ),
                     );
                   },
                 ),
@@ -114,9 +106,11 @@ class ProfileScreen extends StatelessWidget {
                   'Tentang Aplikasi',
                   Icons.info_outline,
                   () {
-                    // Navigate to about page
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Tentang Aplikasi diklik')),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AboutAppScreen(),
+                   ),
                     );
                   },
                 ),
