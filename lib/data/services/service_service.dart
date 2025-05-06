@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../../data/models/service_model.dart'; // Sesuaikan path model
+import '../../data/models/service_model.dart';
+import 'config.dart'; // Sesuaikan path model
 
 class ServiceService {
-  static const String baseUrl =
-      "http://192.168.0.105:8000/api"; // Ganti dengan URL API Anda
 
   static Future<List<ServiceModel>> getAllServices() async {
-    final response = await http.get(Uri.parse('$baseUrl/services'));
+    final response = await http.get(Uri.parse('${Config.baseUrl}/services'));
 
     if (response.statusCode == 200) {
       final jsonBody = json.decode(response.body);
@@ -20,7 +19,7 @@ class ServiceService {
 
   static Future<List<ServiceModel>> searchServices(String query) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/services?search=$query'),
+      Uri.parse('${Config.baseUrl}/services?search=$query'),
     );
 
     if (response.statusCode == 200) {

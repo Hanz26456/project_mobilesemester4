@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../data/services/history_service.dart'; // ganti dengan file tempat kamu taruh fetchUserOrders
+import '../../data/models/order_response.dart';   // file model OrderResponse kamu
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/services/history_service.dart';
 import '../../data/models/order_response.dart';
-import '../fitur dalam/detailpesanan.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -12,7 +13,8 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
-  Future<List<OrderResponse>>? futureOrders;
+  late Future<List<OrderResponse>> futureOrders;
+
   int? userId;
 
   @override
@@ -24,14 +26,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
   void loadUserAndFetch() async {
     final prefs = await SharedPreferences.getInstance();
     final savedUserId = prefs.getInt('user_id');
-    print('✅ user_id dari SharedPreferences: $savedUserId');
+    print('✅ user_id dari SharedPreferences: $savedUserId'); // ini untuk debug
 
     if (savedUserId != null) {
       setState(() {
         userId = savedUserId;
         futureOrders = fetchUserOrders(savedUserId).catchError((e) {
           print('❌ Error fetchUserOrders: $e');
-          return <OrderResponse>[];
+          return <OrderResponse>[]; // supaya gak macet
         });
       });
     } else {
@@ -43,62 +45,67 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: userId == null
-            ? const Center(child: CircularProgressIndicator())
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    child: Center(
-                      child: Text(
-                        'Riwayat',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+        child:
+            userId == null
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // 🔵 Judul Riwayat
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(
+                        child: Text(
+                          'Riwayat',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: FutureBuilder<List<OrderResponse>>(
-                      future: futureOrders,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return const Center(child: Text('Gagal memuat riwayat.'));
-                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return const Center(child: Text('Tidak ada riwayat pesanan.'));
-                        }
 
-                        final orders = snapshot.data!;
-                        return ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: orders.length,
-                          itemBuilder: (context, index) {
-                            final order = orders[index];
+                    // 🔄 FutureBuilder
+                    Expanded(
+                      child: FutureBuilder<List<OrderResponse>>(
+                        future: futureOrders,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          } else if (snapshot.hasError) {
+                            return const Center(
+                              child: Text('Gagal memuat riwayat.'),
+                            );
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return const Center(
+                              child: Text('Tidak ada riwayat pesanan.'),
+                            );
+                          }
 
-                            final allServices = order.orderDetails
-                                .map((detail) => detail.service.name)
-                                .join(', ');
+                          final orders = snapshot.data!;
+                          return ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: orders.length,
+                            itemBuilder: (context, index) {
+                              final order = orders[index];
 
-                            final dateTime = DateTime.parse(order.tanggalPemesanan);
-                            final tanggal =
-                                '${dateTime.day.toString().padLeft(2, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.year}';
-                            final jam =
-                                '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+                              final allServices = order.orderDetails
+                                  .map((detail) => detail.service.name)
+                                  .join(', ');
 
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => OrderDetailsScreen(order: order),
-                                  ),
-                                );
-                              },
-                              child: Column(
+                              final dateTime = DateTime.parse(
+                                order.tanggalPemesanan,
+                              );
+                              final tanggal =
+                                  '${dateTime.day.toString().padLeft(2, '0')}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.year}';
+                              final jam =
+                                  '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+
+                              return Column(
                                 children: [
                                   _buildHistoryItem(
                                     context,
@@ -109,15 +116,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   ),
                                   const SizedBox(height: 16),
                                 ],
-                              ),
-                            );
-                          },
-                        );
-                      },
+                              );
+                            },
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
       ),
     );
   }
@@ -134,7 +140,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
     switch (status.toLowerCase()) {
       case 'process':
-      case 'proses':
         statusColor = Colors.blue.shade100;
         textColor = Colors.blue.shade700;
         break;
@@ -143,19 +148,17 @@ class _HistoryScreenState extends State<HistoryScreen> {
         textColor = Colors.orange.shade700;
         break;
       case 'done':
-      case 'selesai':
         statusColor = Colors.green.shade100;
         textColor = Colors.green.shade700;
         break;
       default:
-        statusColor = Colors.grey.shade200;
-        textColor = Colors.black54;
+        statusColor = Colors.grey.shade100;
     }
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -188,6 +191,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ],
             ),
           ),
+
+          // Tanggal dan Status
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
