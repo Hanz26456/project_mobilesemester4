@@ -8,9 +8,9 @@ import '../models/user_models.dart';
 
 class AuthService {
   static const String baseUrl =
-      "http://192.168.1.6:8000/api"; // Pastikan URL benar
+      "http://192.168.0.105:8000/api"; // Pastikan URL benar
 
-  // ✅ REGISTER
+
   Future<bool> register(RegisterRequest request) async {
     final url = Uri.parse('$baseUrl/register');
     final body = json.encode(request.toJson());

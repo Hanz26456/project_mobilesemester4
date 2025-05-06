@@ -29,21 +29,18 @@ class _LoginScreenState extends State<LoginScreen> {
     final user = await AuthService().login(loginRequest);
 
     if (user != null) {
-      // Simpan user_id ke SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('user_id', user.id); // pastikan user.id tersedia
+      await prefs.setInt('user_id', user.id);
+      await prefs.setString('user_address', user.address); // 🔥 Tambahkan ini
 
-      // Navigasi ke HomeScreen
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Login gagal, coba lagi!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Login gagal, coba lagi!")));
     }
   }
 
@@ -114,29 +111,44 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 100,
                         ),
                         const SizedBox(height: 8),
-                        Text('HOME SERVICE', style: AppTextStyles.poppinsHeading),
+                        Text(
+                          'HOME SERVICE',
+                          style: AppTextStyles.poppinsHeading,
+                        ),
                         const SizedBox(height: 4),
                         Text(
                           'Please Log in To Continue',
-                          style: AppTextStyles.interRegular.copyWith(fontSize: 13),
+                          style: AppTextStyles.interRegular.copyWith(
+                            fontSize: 13,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
                         CustomTextField(
                           controller: _emailController,
                           hint: 'Email',
-                          icon: Image.asset('assets/images/Letter.png', width: 20, height: 20),
+                          icon: Image.asset(
+                            'assets/images/Letter.png',
+                            width: 20,
+                            height: 20,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         CustomTextField(
                           controller: _passwordController,
                           hint: 'Password',
-                          icon: Image.asset('assets/images/img_lock.png', width: 20, height: 20),
+                          icon: Image.asset(
+                            'assets/images/img_lock.png',
+                            width: 20,
+                            height: 20,
+                          ),
                           obscureText: _obscureText,
                           suffixIcon: IconButton(
                             icon: Icon(
                               color: Colors.grey,
-                              _obscureText ? Icons.visibility_off : Icons.visibility,
+                              _obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                             ),
                             onPressed: () {
                               setState(() {
@@ -162,7 +174,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 const Text(
                                   'Remember me',
-                                  style: TextStyle(fontFamily: 'Inter', fontSize: 13),
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ],
                             ),
@@ -170,7 +185,11 @@ class _LoginScreenState extends State<LoginScreen> {
                               onTap: () {},
                               child: const Text(
                                 'Forgot Password?',
-                                style: TextStyle(fontFamily: 'Inter', fontSize: 13, color: Colors.blue),
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 13,
+                                  color: Colors.blue,
+                                ),
                               ),
                             ),
                           ],
@@ -187,13 +206,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("Don't have an account?", style: TextStyle(fontFamily: 'Inter')),
+                            const Text(
+                              "Don't have an account?",
+                              style: TextStyle(fontFamily: 'Inter'),
+                            ),
                             const SizedBox(width: 4),
                             InkWell(
                               onTap: () {},
                               child: const Text(
                                 'Sign up',
-                                style: TextStyle(fontFamily: 'Inter', color: Colors.lightBlue),
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  color: Colors.lightBlue,
+                                ),
                               ),
                             ),
                           ],
@@ -202,7 +227,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         const Text(
                           'by logging in , you agree to the\nPrivacy Policy & Terms of Service',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontFamily: 'Inter', fontSize: 11, color: Colors.white),
+                          style: TextStyle(
+                            fontFamily: 'Inter',
+                            fontSize: 11,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 48),
                       ],
