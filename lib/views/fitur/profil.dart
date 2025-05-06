@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../auth/login.dart';
-import '../fitur dalam/editprofil.dart'; // Import the edit profile screen
-
+import '../fitur dalam/changepassword.dart';
+import '../fitur dalam/editprofil.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -76,9 +76,11 @@ class ProfileScreen extends StatelessWidget {
                   'Ganti Password',
                   Icons.lock_outline,
                   () {
-                    // Navigate to change password
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Ganti Password diklik')),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ChangePassword(),
+                      ),
                     );
                   },
                 ),
@@ -123,72 +125,75 @@ class ProfileScreen extends StatelessWidget {
 
                 // Logout Button
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey.shade100,
+  padding: const EdgeInsets.symmetric(horizontal: 16),
+  child: Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(8),
+      color: Colors.grey.shade100,
+    ),
+    child: ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.red.shade100,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(Icons.logout, color: Colors.red.shade600),
+      ),
+      title: Text(
+        'Log Out',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.red.shade600,
+        ),
+      ),
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Konfirmasi'),
+            content: const Text('Apakah Anda yakin ingin keluar?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Tutup dialog
+                  
+                  // Tampilkan snackbar
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Berhasil logout'),
                     ),
-                    child: ListTile(
-                      leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.red.shade100,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(Icons.logout, color: Colors.red.shade600),
-                      ),
-                      title: Text(
-                        'Log Out',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red.shade600,
-                        ),
-                      ),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Konfirmasi'),
-                            content: const Text('Apakah Anda yakin ingin keluar?'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Batal'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context); // Tutup dialog
-                                  
-                                  // Tampilkan snackbar
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Berhasil logout'),
-                                    ),
-                                  );
-                                  
-                                  // Pergi ke halaman Login
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => LoginScreen(),
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  'Ya, Keluar',
-                                  style: TextStyle(
-                                    color: Colors.red.shade600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
+                  );
+                  
+                  // Pergi ke halaman Login
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(), // Ganti LoginPage dengan nama file login kamu
                     ),
+                  );
+                },
+                child: Text(
+                  'Ya, Keluar',
+                  style: TextStyle(
+                    color: Colors.red.shade600,
                   ),
                 ),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+  ),
+),
+
+
+                // Menghapus Spacer() yang menyebabkan overflow
               ],
             ),
           ),

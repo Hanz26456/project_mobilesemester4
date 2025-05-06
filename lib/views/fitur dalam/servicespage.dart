@@ -6,7 +6,7 @@ import '../fitur dalam/pesanlayanan.dart';
 class ServicePage extends StatelessWidget {
   final ServiceModel service;
 
-  const ServicePage({Key? key, required this.service}) : super(key: key);
+  const ServicePage({super.key, required this.service});
 
   @override
   Widget build(BuildContext context) {

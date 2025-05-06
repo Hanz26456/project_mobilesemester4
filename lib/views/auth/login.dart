@@ -8,6 +8,7 @@ import '../fitur/home.dart';
 import '../../data/services/auth_service.dart';
 import '../../data/models/login_request.dart';
 import '../auth/forgotpassword.dart';
+import 'register.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,19 +24,26 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login() async {
-    final email = _emailController.text;
+    final email = _emailController.text.trim();
     final password = _passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Email dan password wajib diisi.")),
+      );
+      return;
+    }
 
     final loginRequest = LoginRequest(email: email, password: password);
 
     final user = await AuthService().login(loginRequest);
 
     if (user != null) {
-      // Simpan user_id ke SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('user_id', user.id);
-      await prefs.setString('user_address', user.address); // 🔥 Tambahkan ini
-      // Navigasi ke HomeScreen
+      await prefs.setString('user_address', user.address);
+      await prefs.setString('email', user.email);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -253,7 +261,15 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(width: 4),
                             InkWell(
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const RegisterScreen(),
+                                  ),
+                                );
+                              },
                               child: const Text(
                                 'Sign up',
                                 style: TextStyle(
