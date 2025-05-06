@@ -25,4 +25,16 @@ class UserModel {
       role: json['role'],
     );
   }
+
+  // Menambahkan metode toJson
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'username': username,
+      'email': email,
+      'phone': phone,
+      'address': address,
+      'role': role,
+    };
+  }
 }
