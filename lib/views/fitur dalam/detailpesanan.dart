@@ -9,7 +9,7 @@ import '../../widgets/primary_button.dart';
 class OrderDetailsScreen extends StatefulWidget {
   final OrderResponse order;
 
-  const OrderDetailsScreen({Key? key, required this.order}) : super(key: key);
+  const OrderDetailsScreen({super.key, required this.order});
 
   @override
   State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
@@ -299,7 +299,7 @@ Future<void> _printTransactionReceipt() async {
                       ),
                     ],
                   );
-                }).toList(),
+                }),
               ],
             ),
 

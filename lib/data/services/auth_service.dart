@@ -6,8 +6,9 @@ import '../models/register_request.dart';
 import '../models/login_request.dart';
 import '../models/user_models.dart';
 import 'config.dart';
-class AuthService {
 
+class AuthService {
+  // 🔸 REGISTER
   Future<bool> register(RegisterRequest request) async {
     final url = Uri.parse('${Config.baseUrl}/register');
     final body = json.encode(request.toJson());
@@ -19,12 +20,12 @@ class AuthService {
         body: body,
       );
 
+      final data = json.decode(response.body);
+
       if (response.statusCode == 201) {
-        final data = json.decode(response.body);
         print("Registrasi berhasil: ${data['message']}");
         return true;
       } else {
-        final data = json.decode(response.body);
         print("Gagal registrasi: ${data['message'] ?? 'Unknown error'}");
         return false;
       }
@@ -40,26 +41,28 @@ class AuthService {
     final body = json.encode(request.toJson());
 
     try {
+      print("Login body: $body"); // 🔍 Debug isi body
+
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
 
+      final data = json.decode(response.body);
+
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
         final token = data['token'];
 
-        // Simpan token menggunakan shared_preferences
+        // ✅ Simpan token
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token); // Menyimpan token
+        await prefs.setString('token', token);
 
         print("Login berhasil! Token disimpan.");
 
-        // Mengembalikan UserModel dengan data pengguna yang login
+        // 🔁 Return user
         return UserModel.fromJson(data['user']);
       } else {
-        final data = json.decode(response.body);
         print("Login gagal: ${data['message'] ?? 'Unknown error'}");
         return null;
       }
