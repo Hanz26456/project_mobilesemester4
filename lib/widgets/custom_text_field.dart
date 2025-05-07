@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   final bool autofocus;
   final FormFieldValidator<String>? validator;
   final TextInputType? keyboardType;
+  final bool readOnly; // pastikan ini ada
   final bool enabled; // 🔹 Tambahkan ini
 
   const CustomTextField({
@@ -20,6 +21,7 @@ class CustomTextField extends StatelessWidget {
     this.controller,
     this.autofocus = false,
     this.validator,
+    this.readOnly = false,
     this.keyboardType,
     this.enabled = true, // 🔹 Default true
   });
@@ -31,6 +33,7 @@ class CustomTextField extends StatelessWidget {
       controller: controller,
       obscureText: obscureText,
       validator: validator,
+       readOnly: readOnly,
       keyboardType: keyboardType,
       enabled: enabled, // 🔹 Tambahkan ini
       decoration: InputDecoration(

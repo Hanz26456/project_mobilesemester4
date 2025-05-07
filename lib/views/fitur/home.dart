@@ -51,9 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const ServicesScreen(),
       const HistoryScreen(),
       const ProfileScreen(),
-      const Center(
-        child: Text('Halaman Riwayat'),
-      ),
+      const Center(child: Text('Halaman Riwayat')),
     ];
   }
 
@@ -101,7 +99,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<ServiceModel> popularServices = [];
   bool isLoadingPopular = false;
-  
+
   // Tambahkan untuk user
   UserModel? currentUser;
   bool isLoadingUser = false;
@@ -121,7 +119,7 @@ class _HomePageState extends State<HomePage> {
       // Ambil data user dari SharedPreferences yang disimpan saat login
       final prefs = await SharedPreferences.getInstance();
       String? userJson = prefs.getString('user_data');
-      
+
       if (userJson != null) {
         Map<String, dynamic> userData = json.decode(userJson);
         setState(() {
@@ -168,22 +166,24 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       isLoadingUser
                           ? const SizedBox(
-                              width: 150,
-                              child: Text(
-                                'Memuat...',
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            )
-                          : Text(
-                              'Halo, ${currentUser?.username ?? 'Pengguna'}',
-                              style: const TextStyle(
+                            width: 150,
+                            child: Text(
+                              'Memuat...',
+                              style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                          )
+                          : Text(
+                            currentUser != null
+                                ? 'Halo, ${currentUser!.username}'
+                                : 'Memuat data pengguna...',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                       Stack(
                         children: [
                           IconButton(
@@ -715,4 +715,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

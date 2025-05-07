@@ -39,53 +39,33 @@ class AboutAppScreen extends StatelessWidget {
         elevation: 0,
         title: const Text(
           'Tentang Aplikasi',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            // Kembali ke halaman sebelumnya
+            // Navigasi kembali
           },
         ),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Header Section with App Logo
+            // Header dengan logo tanpa background putih
             Container(
               width: double.infinity,
               color: const Color(0xFF2A9D8F),
               padding: const EdgeInsets.only(top: 20, bottom: 40),
               child: Column(
                 children: [
-                  Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          spreadRadius: 1,
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.apps_rounded,
-                        size: 70,
-                        color: const Color(0xFF2A9D8F),
-                      ),
-                    ),
+                  Image.asset(
+                    'assets/images/logopolosputih.png',
+                    width: 150,
+                    height: 150,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   const Text(
-                    'MyApp',
+                    'HomeService',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 28,
@@ -94,24 +74,24 @@ class AboutAppScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
-                      'Versi 2.5.1',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                      'Versi 1.0.0',
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
                 ],
               ),
             ),
-            
-            // App Info Section
+
+            // Informasi aplikasi
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(20),
@@ -123,45 +103,45 @@ class AboutAppScreen extends StatelessWidget {
                   _InfoItem(
                     icon: Icons.info_outline,
                     title: 'Versi',
-                    subtitle: '2.5.1 (Build 1245)',
+                    subtitle: '1.0.0 (Build 2025)',
                   ),
                   _InfoItem(
                     icon: Icons.calendar_today,
                     title: 'Tanggal Rilis',
-                    subtitle: '15 April 2025',
+                    subtitle: 'Belum dirilis',
                   ),
                   _InfoItem(
                     icon: Icons.update,
                     title: 'Pembaruan Terakhir',
-                    subtitle: '2 Mei 2025',
+                    subtitle: 'Belum ada pembaruan',
                   ),
                   _InfoItem(
                     icon: Icons.storage,
                     title: 'Ukuran Aplikasi',
                     subtitle: '24.5 MB',
                   ),
-                  
+
                   const SizedBox(height: 30),
                   const _SectionTitle(title: 'Pengembang'),
                   const SizedBox(height: 15),
                   _InfoItem(
                     icon: Icons.business,
                     title: 'Perusahaan',
-                    subtitle: 'PT Aplikasi Indonesia',
+                    subtitle: 'Kelompok 2 - Kampus Bondowoso',
                   ),
                   _InfoItem(
                     icon: Icons.public,
                     title: 'Website',
-                    subtitle: 'www.myapp.com',
+                    subtitle: 'http://aplicationhs.test/dashboard',
                     isLink: true,
                   ),
                   _InfoItem(
                     icon: Icons.email,
                     title: 'Email',
-                    subtitle: 'support@myapp.com',
+                    subtitle: 'e41232012@student.polije.ac.id',
                     isLink: true,
                   ),
-                  
+
                   const SizedBox(height: 30),
                   const _SectionTitle(title: 'Fitur Terbaru'),
                   const SizedBox(height: 15),
@@ -170,78 +150,35 @@ class AboutAppScreen extends StatelessWidget {
                     description: 'Desain yang lebih modern dan mudah digunakan',
                   ),
                   const _FeatureItem(
-                    title: 'Mode Gelap',
-                    description: 'Dukungan untuk tema gelap untuk kenyamanan mata',
+                    title: 'Pesan layanan',
+                    description: 'Pesan layanan dengan mudah dan cepat',
                   ),
                   const _FeatureItem(
                     title: 'Peningkatan Performa',
                     description: 'Aplikasi berjalan lebih cepat dan responsif',
                   ),
                   const _FeatureItem(
-                    title: 'Fitur Sinkronisasi',
-                    description: 'Sinkronisasi data antar perangkat secara real-time',
+                    title: 'Keamanan Data',
+                    description:
+                        'Data pengguna lebih aman dengan enkripsi terbaru',
                   ),
-                  
+
                   const SizedBox(height: 30),
-                  const _SectionTitle(title: 'Izin Aplikasi'),
-                  const SizedBox(height: 15),
-                  _PermissionItem(
-                    title: 'Kamera',
-                    description: 'Digunakan untuk mengambil foto profil dan pemindaian',
-                  ),
-                  _PermissionItem(
-                    title: 'Lokasi',
-                    description: 'Digunakan untuk fitur peta dan rekomendasi terdekat',
-                  ),
-                  _PermissionItem(
-                    title: 'Penyimpanan',
-                    description: 'Digunakan untuk menyimpan data aplikasi dan file lokal',
-                  ),
-                  _PermissionItem(
-                    title: 'Mikrofon',
-                    description: 'Digunakan untuk fitur pencarian suara dan perekaman',
-                  ),
-                ],
-              ),
-            ),
-            
-            // Legal Section
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
                   const _SectionTitle(title: 'Legal'),
                   const SizedBox(height: 15),
-                  _LegalButton(
-                    title: 'Kebijakan Privasi',
-                    onPressed: () {},
-                  ),
+                  _LegalButton(title: 'Kebijakan Privasi', onPressed: () {}),
                   const SizedBox(height: 10),
-                  _LegalButton(
-                    title: 'Syarat & Ketentuan',
-                    onPressed: () {},
-                  ),
+                  _LegalButton(title: 'Syarat & Ketentuan', onPressed: () {}),
                   const SizedBox(height: 10),
-                  _LegalButton(
-                    title: 'Lisensi Open Source',
-                    onPressed: () {},
-                  ),
-                  const SizedBox(height: 30),
                   Text(
-                    '© 2025 PT Aplikasi Indonesia. Semua hak dilindungi.',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
+                    '© 2025 Kelompok 2 - HomeServiceApp. Semua hak dilindungi.',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Dibuat dengan ❤️ di Indonesia',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
+                    'Dibuat Oleh Mahasiswa Politeknik Negeri Jember',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -256,11 +193,8 @@ class AboutAppScreen extends StatelessWidget {
 
 class _SectionTitle extends StatelessWidget {
   final String title;
-  
-  const _SectionTitle({
-    required this.title,
-    Key? key,
-  }) : super(key: key);
+
+  const _SectionTitle({required this.title, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -280,7 +214,7 @@ class _InfoItem extends StatelessWidget {
   final String title;
   final String subtitle;
   final bool isLink;
-  
+
   const _InfoItem({
     required this.icon,
     required this.title,
@@ -303,11 +237,7 @@ class _InfoItem extends StatelessWidget {
               color: const Color(0xFF2A9D8F).withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              icon,
-              color: const Color(0xFF2A9D8F),
-              size: 22,
-            ),
+            child: Icon(icon, color: const Color(0xFF2A9D8F), size: 22),
           ),
           const SizedBox(width: 15),
           Expanded(
@@ -329,7 +259,8 @@ class _InfoItem extends StatelessWidget {
                     fontSize: 15,
                     color: isLink ? const Color(0xFF2A9D8F) : Colors.grey[600],
                     fontWeight: isLink ? FontWeight.w500 : FontWeight.normal,
-                    decoration: isLink ? TextDecoration.underline : TextDecoration.none,
+                    decoration:
+                        isLink ? TextDecoration.underline : TextDecoration.none,
                   ),
                 ),
               ],
@@ -344,12 +275,9 @@ class _InfoItem extends StatelessWidget {
 class _FeatureItem extends StatelessWidget {
   final String title;
   final String description;
-  
-  const _FeatureItem({
-    required this.title,
-    required this.description,
-    Key? key,
-  }) : super(key: key);
+
+  const _FeatureItem({required this.title, required this.description, Key? key})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -365,11 +293,7 @@ class _FeatureItem extends StatelessWidget {
               color: const Color(0xFF2A9D8F),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
-              Icons.check,
-              color: Colors.white,
-              size: 16,
-            ),
+            child: const Icon(Icons.check, color: Colors.white, size: 16),
           ),
           const SizedBox(width: 15),
           Expanded(
@@ -386,10 +310,7 @@ class _FeatureItem extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -397,97 +318,15 @@ class _FeatureItem extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _PermissionItem extends StatelessWidget {
-  final String title;
-  final String description;
-  
-  const _PermissionItem({
-    required this.title,
-    required this.description,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 15),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              _getPermissionIcon(title),
-              color: Colors.grey[700],
-              size: 22,
-            ),
-          ),
-          const SizedBox(width: 15),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Switch(
-            value: true,
-            activeColor: const Color(0xFF2A9D8F),
-            onChanged: (value) {},
-          ),
-        ],
-      ),
-    );
-  }
-  
-  IconData _getPermissionIcon(String permission) {
-    switch(permission.toLowerCase()) {
-      case 'kamera':
-        return Icons.camera_alt_outlined;
-      case 'lokasi':
-        return Icons.location_on_outlined;
-      case 'penyimpanan':
-        return Icons.folder_outlined;
-      case 'mikrofon':
-        return Icons.mic_outlined;
-      default:
-        return Icons.settings_outlined;
-    }
   }
 }
 
 class _LegalButton extends StatelessWidget {
   final String title;
   final VoidCallback onPressed;
-  
-  const _LegalButton({
-    required this.title,
-    required this.onPressed,
-    Key? key,
-  }) : super(key: key);
+
+  const _LegalButton({required this.title, required this.onPressed, Key? key})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -514,11 +353,7 @@ class _LegalButton extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 5),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-              color: Colors.grey[600],
-            ),
+            Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey[600]),
           ],
         ),
       ),

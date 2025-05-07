@@ -276,55 +276,6 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
               ),
             ),
             
-            // Help Categories
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Kategori Bantuan',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  _HelpCategoryItem(
-                    icon: Icons.person,
-                    title: 'Akun & Profil',
-                    subtitle: 'Pengaturan akun, keamanan, dan informasi profil',
-                    onTap: () {},
-                  ),
-                  _HelpCategoryItem(
-                    icon: Icons.payment,
-                    title: 'Pembayaran & Tagihan',
-                    subtitle: 'Metode pembayaran, tagihan, dan pengembalian dana',
-                    onTap: () {},
-                  ),
-                  _HelpCategoryItem(
-                    icon: Icons.privacy_tip,
-                    title: 'Privasi & Keamanan',
-                    subtitle: 'Pengaturan privasi, izin, dan keamanan akun',
-                    onTap: () {},
-                  ),
-                  _HelpCategoryItem(
-                    icon: Icons.sync,
-                    title: 'Sinkronisasi & Pencadangan',
-                    subtitle: 'Sinkronisasi data, backup, dan restore',
-                    onTap: () {},
-                  ),
-                  _HelpCategoryItem(
-                    icon: Icons.devices,
-                    title: 'Perangkat & Kompatibilitas',
-                    subtitle: 'Masalah spesifik perangkat dan kompatibilitas sistem',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
-            
             // Video Tutorials
             Container(
               width: double.infinity,
@@ -401,14 +352,14 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                   _SupportChannelItem(
                     icon: Icons.email,
                     title: 'Email',
-                    info: 'support@myapp.com',
+                    info: 'E41232012@student.polije.ac.id',
                     onTap: () {},
                   ),
                   const Divider(),
                   _SupportChannelItem(
                     icon: Icons.phone,
                     title: 'Telepon',
-                    info: '+62 800-123-4567',
+                    info: '+62 8585-8931-095',
                     onTap: () {},
                   ),
                   const Divider(),
@@ -422,7 +373,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                   _SupportChannelItem(
                     icon: Icons.language,
                     title: 'Website',
-                    info: 'www.myapp.com/support',
+                    info: 'http://aplicationhs.test/dashboard',
                     onTap: () {},
                   ),
                 ],
@@ -491,7 +442,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
               child: Column(
                 children: [
                   const Text(
-                    'MyApp © 2025',
+                    'HomeService © 2025',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey,
@@ -499,7 +450,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    'Versi 2.5.1',
+                    'Versi 1.0.0',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[400],
@@ -622,93 +573,6 @@ class _FAQItem extends StatelessWidget {
   }
 }
 
-class _HelpCategoryItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-  
-  const _HelpCategoryItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 3,
-            spreadRadius: 1,
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(10),
-          child: Padding(
-            padding: const EdgeInsets.all(15),
-            child: Row(
-              children: [
-                Container(
-                  width: 45,
-                  height: 45,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2A9D8F).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: const Color(0xFF2A9D8F),
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 16,
-                  color: Colors.grey,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _VideoTutorialItem extends StatelessWidget {
   final String title;

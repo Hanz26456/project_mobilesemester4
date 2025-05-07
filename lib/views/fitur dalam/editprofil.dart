@@ -126,6 +126,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
+  bool _editingUsername = false;
+  bool _editingPhone = false;
+  bool _editingAddress = false;
+  bool _editingEmail = false;
+
+  UserModel? _currentUser;
+  bool _isLoading = true;
+  bool _loadError = false;
+  String _errorMessage = '';
+
   final _formKey = GlobalKey<FormState>(); 
 
   @override
@@ -145,19 +155,41 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
 
     _animationController.forward();
     
-    _loadUserProfile();  // Memanggil fungsi untuk memuat profil
+    _loadUserProfile();
   }
 
   Future<void> _loadUserProfile() async {
-    final user = await AuthService().getUserProfile();
+    setState(() {
+      _isLoading = true;
+      _loadError = false;
+    });
+    
+    try {
+      final user = await AuthService().getUserProfile();
 
-    if (user != null) {
+      if (user != null) {
+        setState(() {
+          _currentUser = user;
+          _usernameController.text = user.username;
+          _phoneController.text = user.phone;
+          _addressController.text = user.address;
+          _emailController.text = user.email;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+          _loadError = true;
+          _errorMessage = 'Tidak dapat memuat profil. Data null.';
+        });
+      }
+    } catch (e) {
       setState(() {
-        _usernameController.text = user.username;
-        _phoneController.text = user.phone;
-        _addressController.text = user.address;
-        _emailController.text = user.email;
+        _isLoading = false;
+        _loadError = true;
+        _errorMessage = 'Error saat mengambil profil: $e';
       });
+      print('Error saat mengambil profil: $e');
     }
   }
 
@@ -190,141 +222,204 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: FadeTransition(
-        opacity: _fadeInAnimation,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Illustration
-                Center(
-                  child: Image.asset(
-                    'assets/images/editprofil.png',
-                    height: 180,
-                    fit: BoxFit.fitHeight,
-                    errorBuilder: (context, error, stackTrace) {
-                      return SizedBox(
-                        height: 180,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _buildIllustrationPerson(
-                              const Color(0xFF8B6E4E),
-                              const Color(0xFFE5BEA0),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor))
+          : _loadError
+              ? _buildErrorView()
+              : FadeTransition(
+                  opacity: _fadeInAnimation,
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Image.asset(
+                              'assets/images/editprofil.png',
+                              height: 180,
+                              fit: BoxFit.fitHeight,
+                              errorBuilder: (context, error, stackTrace) {
+                                return SizedBox(
+                                  height: 180,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _buildIllustrationPerson(
+                                        const Color(0xFF8B6E4E),
+                                        const Color(0xFFE5BEA0),
+                                      ),
+                                      const SizedBox(width: 20),
+                                      _buildIllustrationPerson(
+                                        const Color(0xFF424242),
+                                        const Color(0xFFEADAC5),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
-                            const SizedBox(width: 20),
-                            _buildIllustrationPerson(
-                              const Color(0xFF424242),
-                              const Color(0xFFEADAC5),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Title and Subtitle
-                const Text(
-                  'Edit Profil',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  'Bosku, mau update profil?\nGanti nama atau email biar makin kece!',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      CustomTextField(
-                        controller: _usernameController,
-                        icon: const Icon(Icons.person_outline),
-                        hint: 'Username',
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Username harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      CustomTextField(
-                        controller: _phoneController,
-                        icon: const Icon(Icons.phone_outlined),
-                        hint: 'No.telp',
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Nomor telepon harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      CustomTextField(
-                        controller: _addressController,
-                        icon: const Icon(Icons.location_on_outlined),
-                        hint: 'Alamat',
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Alamat harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      CustomTextField(
-                        controller: _emailController,
-                        icon: const Icon(Icons.email_outlined),
-                        hint: 'Email',
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Email harus diisi';
-                          }
-                          if (!RegExp(r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$").hasMatch(value)) {
-                            return 'Email tidak valid';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 32),
-                      SlideTransition(
-                        position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
-                          CurvedAnimation(
-                            parent: _animationController,
-                            curve: const Interval(0.6, 1.0, curve: Curves.easeOut),
                           ),
-                        ),
-                        child: PrimaryButton(
-                          label: 'Selesai',
-                          onPressed: () {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              _saveProfile();
-                            }
-                          },
-                        ),
+                          const SizedBox(height: 24),
+                          const Text(
+                            'Edit Profil',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          const Text(
+                            'Bosku, mau update profil?\nGanti nama atau email biar makin kece!',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          Form(
+                            key: _formKey,
+                            child: Column(
+                              children: [
+                                _buildEditableTextField(
+                                  controller: _usernameController,
+                                  icon: const Icon(Icons.person_outline),
+                                  hint: 'Username',
+                                  isEditing: _editingUsername,
+                                  onEditTap: () {
+                                    setState(() {
+                                      _editingUsername = !_editingUsername;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Username harus diisi';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                
+                                _buildEditableTextField(
+                                  controller: _phoneController,
+                                  icon: const Icon(Icons.phone_outlined),
+                                  hint: 'No.telp',
+                                  isEditing: _editingPhone,
+                                  onEditTap: () {
+                                    setState(() {
+                                      _editingPhone = !_editingPhone;
+                                    });
+                                  },
+                                  keyboardType: TextInputType.phone,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Nomor telepon harus diisi';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                
+                                _buildEditableTextField(
+                                  controller: _addressController,
+                                  icon: const Icon(Icons.location_on_outlined),
+                                  hint: 'Alamat',
+                                  isEditing: _editingAddress,
+                                  onEditTap: () {
+                                    setState(() {
+                                      _editingAddress = !_editingAddress;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Alamat harus diisi';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 16),
+                                
+                                _buildEditableTextField(
+                                  controller: _emailController,
+                                  icon: const Icon(Icons.email_outlined),
+                                  hint: 'Email',
+                                  isEditing: _editingEmail,
+                                  onEditTap: () {
+                                    setState(() {
+                                      _editingEmail = !_editingEmail;
+                                    });
+                                  },
+                                  keyboardType: TextInputType.emailAddress,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Email harus diisi';
+                                    }
+                                    if (!RegExp(r"^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$").hasMatch(value)) {
+                                      return 'Email tidak valid';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 32),
+                                
+                                SlideTransition(
+                                  position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero).animate(
+                                    CurvedAnimation(
+                                      parent: _animationController,
+                                      curve: const Interval(0.6, 1.0, curve: Curves.easeOut),
+                                    ),
+                                  ),
+                                  child: PrimaryButton(
+                                    label: 'Selesai',
+                                    onPressed: () {
+                                      if (_formKey.currentState?.validate() ?? false) {
+                                        _saveProfile();
+                                      }
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 24),
-                    ],
+                    ),
                   ),
                 ),
-              ],
+    );
+  }
+
+  Widget _buildErrorView() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: AppTheme.error,
+              size: 64,
             ),
-          ),
+            const SizedBox(height: 16),
+            Text(
+              'Terjadi Kesalahan',
+              style: Theme.of(context).textTheme.headlineMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _errorMessage,
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: _loadUserProfile,
+              child: const Text('Coba Lagi'),
+            ),
+          ],
         ),
       ),
     );
@@ -345,15 +440,72 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
     );
   }
 
-  void _saveProfile() {
-    final updatedUser = UserModel(
-      id: 0, // Ganti dengan ID yang sesuai
-      username: _usernameController.text,
-      email: _emailController.text,
-      phone: _phoneController.text,
-      address: _addressController.text,
-      role: '', // Jika Anda ingin menambahkan role
+  Widget _buildEditableTextField({
+    required TextEditingController controller,
+    required Icon icon,
+    required String hint,
+    required bool isEditing,
+    required VoidCallback onEditTap,
+    required String? Function(String?)? validator,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Stack(
+      children: [
+        CustomTextField(
+          controller: controller,
+          icon: icon,
+          hint: hint,
+          keyboardType: keyboardType,
+          validator: validator,
+          enabled: isEditing,
+          readOnly: !isEditing,
+        ),
+        Positioned(
+          right: 12,
+          top: 0,
+          bottom: 0,
+          child: Center(
+            child: IconButton(
+              icon: Icon(
+                isEditing ? Icons.check : Icons.edit,
+                color: AppTheme.primaryColor,
+                size: 20,
+              ),
+              onPressed: onEditTap,
+            ),
+          ),
+        ),
+      ],
     );
+  }
+
+  void _saveProfile() {
+    if (_currentUser == null) {
+      _currentUser = UserModel(
+        id: 0, 
+        username: _usernameController.text,
+        email: _emailController.text,
+        phone: _phoneController.text,
+        address: _addressController.text,
+        role: '',
+      );
+    } else {
+      _currentUser = UserModel(
+        id: _currentUser!.id,
+        username: _usernameController.text,
+        email: _emailController.text,
+        phone: _phoneController.text,
+        address: _addressController.text,
+        role: _currentUser!.role,
+      );
+    }
+
+    setState(() {
+      _editingUsername = false;
+      _editingPhone = false;
+      _editingAddress = false;
+      _editingEmail = false;
+    });
 
     showDialog(
       context: context,
@@ -361,19 +513,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
       builder: (BuildContext context) {
         return const Center(
           child: CircularProgressIndicator(
-            color: Color(0xFF2A9D8F), // AppTheme.primaryColor
+            color: AppTheme.primaryColor,
           ),
         );
       },
     );
 
-    AuthService().updateUserProfile(updatedUser).then((success) {
-      Navigator.pop(context); // Tutup loading dialog
+    AuthService().updateUserProfile(_currentUser!).then((success) {
+      Navigator.pop(context); 
       if (success) {
         _showSuccessDialog();
       } else {
         _showErrorDialog();
       }
+    }).catchError((error) {
+      Navigator.pop(context);
+      _showErrorDialog('Error: $error');
     });
   }
 
@@ -382,23 +537,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.check_circle, color: Color(0xFF2A9D8F), size: 28),
-              SizedBox(width: 8),
-              Text('Sukses!'),
-            ],
-          ),
-          content: const Text('Profil Anda berhasil diperbarui.'),
-          actions: [
+          title: const Text('Profil Berhasil Diperbarui'),
+          actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('OK', style: TextStyle(color: Color(0xFF2A9D8F))),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -406,28 +551,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
     );
   }
 
-  void _showErrorDialog() {
+  void _showErrorDialog([String errorMessage = 'Terjadi kesalahan.']) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Row(
-            children: [
-              Icon(Icons.error, color: Color(0xFFE76F51), size: 28),
-              SizedBox(width: 8),
-              Text('Error'),
-            ],
-          ),
-          content: const Text('Gagal memperbarui profil. Silakan coba lagi.'),
-          actions: [
+          title: const Text('Gagal Memperbarui Profil'),
+          content: Text(errorMessage),
+          actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('OK', style: TextStyle(color: Color(0xFFE76F51))),
+              child: const Text('OK'),
             ),
           ],
         );

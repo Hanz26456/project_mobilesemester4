@@ -9,6 +9,7 @@ import '../../data/services/auth_service.dart';
 import '../../data/models/login_request.dart';
 import '../auth/forgotpassword.dart';
 import 'register.dart';
+import 'dart:convert';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -43,6 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setInt('user_id', user.id);
       await prefs.setString('user_address', user.address);
       await prefs.setString('email', user.email);
+      await prefs.setString('user_data', json.encode(user.toJson()));
+      // 🟢 Tambahkan ini
 
       Navigator.pushReplacement(
         context,

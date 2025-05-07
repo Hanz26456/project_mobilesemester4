@@ -1,197 +1,207 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../auth/login.dart';
 import '../fitur dalam/changepassword.dart';
 import '../fitur dalam/editprofil.dart';
 import '../fitur dalam/aboutapp.dart';
 import '../fitur dalam/pusatbantuan.dart';
-class ProfileScreen extends StatelessWidget {
+import '../../data/models/user_models.dart'; // pastikan ini benar
+
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  UserModel? currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userJson = prefs.getString('user_data');
+    if (userJson != null) {
+      setState(() {
+        currentUser = UserModel.fromJson(json.decode(userJson));
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(
-              bottom: 16,
-            ),
-            child: Column(
-              children: [
-                // Header (Judul halaman)
-                const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Center(
-                    child: Text(
-                      'Profil',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+        child:
+            currentUser == null
+                ? const Center(child: CircularProgressIndicator())
+                : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: Column(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Center(
+                            child: Text(
+                              'Profil',
+                              style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        // Foto profil placeholder (nanti bisa tambahkan user.image kalau tersedia)
+                        Container(
+                          width: 150,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.grey.shade300,
+                          ),
+                          child: const Icon(
+                            Icons.person,
+                            size: 80,
+                            color: Colors.white,
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Nama pengguna dari data user
+                        Text(
+                          currentUser!.username,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        // Email pengguna
+                        Text(
+                          currentUser!.email,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        _buildMenuItem(
+                          context,
+                          'Edit Profil',
+                          Icons.edit_note,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const EditProfileScreen(),
+                              ),
+                            );
+                          },
+                        ),
+
+                        _buildMenuItem(
+                          context,
+                          'Ganti Password',
+                          Icons.lock_outline,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ChangePassword(),
+                              ),
+                            );
+                          },
+                        ),
+
+                        _buildMenuItem(
+                          context,
+                          'Pusat Bantuan',
+                          Icons.help_outline,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HelpCenterScreen(),
+                              ),
+                            );
+                          },
+                        ),
+
+                        _buildMenuItem(
+                          context,
+                          'Tentang Aplikasi',
+                          Icons.info_outline,
+                          () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AboutAppScreen(),
+                              ),
+                            );
+                          },
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Logout
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                              color: Colors.grey.shade100,
+                            ),
+                            child: ListTile(
+                              leading: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade100,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.logout,
+                                  color: Colors.red.shade600,
+                                ),
+                              ),
+                              title: Text(
+                                'Log Out',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red.shade600,
+                                ),
+                              ),
+                              onTap: () async {
+                                final prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.remove('user_data');
+
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-
-                // Profile Picture
-                Container(
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.grey.shade300,
-                  ),
-                  // Jika ada foto profil:
-                  // child: Image.network('URL_FOTO', fit: BoxFit.cover),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Name
-                const Text(
-                  'Jamal',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-
-                const SizedBox(height: 8),
-
-                // Email
-                Text(
-                  'Ngodfingbang@gmail.com',
-                  style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
-                ),
-
-                const SizedBox(height: 32),
-
-                // Menu Items
-                _buildMenuItem(context, 'Edit Profil', Icons.edit_note, () {
-                  // Navigate to edit profile screen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const EditProfileScreen(),
-                    ),
-                  );
-                }),
-
-                _buildMenuItem(
-                  context,
-                  'Ganti Password',
-                  Icons.lock_outline,
-                  () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ChangePassword(),
-                      ),
-                    );
-                  },
-                ),
-
-                _buildMenuItem(
-                  context,
-                  'Pusat Bantuan',
-                  Icons.help_outline,
-                  () {
-                     Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HelpCenterScreen(),
-                   ),
-                    );
-                  },
-                ),
-
-                _buildMenuItem(
-                  context,
-                  'Tentang Aplikasi',
-                  Icons.info_outline,
-                  () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AboutAppScreen(),
-                   ),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 16),
-
-                // Logout Button
-                Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16),
-  child: Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(8),
-      color: Colors.grey.shade100,
-    ),
-    child: ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.red.shade100,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(Icons.logout, color: Colors.red.shade600),
-      ),
-      title: Text(
-        'Log Out',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Colors.red.shade600,
-        ),
-      ),
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Konfirmasi'),
-            content: const Text('Apakah Anda yakin ingin keluar?'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Batal'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context); // Tutup dialog
-                  
-                  // Tampilkan snackbar
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Berhasil logout'),
-                    ),
-                  );
-                  
-                  // Pergi ke halaman Login
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => LoginScreen(), // Ganti LoginPage dengan nama file login kamu
-                    ),
-                  );
-                },
-                child: Text(
-                  'Ya, Keluar',
-                  style: TextStyle(
-                    color: Colors.red.shade600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    ),
-  ),
-),
-
-
-                // Menghapus Spacer() yang menyebabkan overflow
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }
