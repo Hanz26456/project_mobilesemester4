@@ -36,13 +36,13 @@ class HelpCenterScreen extends StatefulWidget {
 
 class _HelpCenterScreenState extends State<HelpCenterScreen> {
   final TextEditingController _searchController = TextEditingController();
-  
+
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,15 +52,12 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
         elevation: 0,
         title: const Text(
           'Pusat Bantuan',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            // Kembali ke halaman sebelumnya
+            Navigator.pop(context); // Kembali ke halaman sebelumnya
           },
         ),
       ),
@@ -71,7 +68,12 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
             Container(
               width: double.infinity,
               color: const Color(0xFF2A9D8F),
-              padding: const EdgeInsets.only(left: 20, right: 20, top: 5, bottom: 30),
+              padding: const EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 5,
+                bottom: 30,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -103,7 +105,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // Text
                   const Text(
                     'Hai, ada yang bisa kami bantu?',
@@ -124,7 +126,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 ],
               ),
             ),
-            
+
             // Contact Support Button
             Container(
               width: double.infinity,
@@ -142,14 +144,11 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 icon: const Icon(Icons.headset_mic),
                 label: const Text(
                   'Hubungi Dukungan Pelanggan',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-            
+
             // Quick Help Section
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -158,10 +157,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 children: [
                   const Text(
                     'Bantuan Cepat',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 15),
                   Row(
@@ -210,7 +206,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 ],
               ),
             ),
-            
+
             // FAQ Section
             Container(
               width: double.infinity,
@@ -220,35 +216,38 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 children: [
                   const Text(
                     'Pertanyaan Umum (FAQ)',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 15),
                   _FAQItem(
                     question: 'Bagaimana cara mengubah kata sandi?',
-                    answer: 'Untuk mengubah kata sandi, buka menu Pengaturan > Keamanan > Ubah Kata Sandi. Anda akan diminta memasukkan kata sandi lama dan kata sandi baru.',
+                    answer:
+                        'Untuk mengubah kata sandi, buka menu Pengaturan > Keamanan > Ubah Kata Sandi. Anda akan diminta memasukkan kata sandi lama dan kata sandi baru.',
                     onTap: () {},
                   ),
                   _FAQItem(
                     question: 'Bagaimana cara menghubungi dukungan?',
-                    answer: 'Anda dapat menghubungi dukungan melalui email di support@myapp.com atau melalui fitur Live Chat di aplikasi pada jam kerja (9.00 - 17.00 WIB).',
+                    answer:
+                        'Anda dapat menghubungi dukungan melalui email di support@myapp.com atau melalui fitur Live Chat di aplikasi pada jam kerja (9.00 - 17.00 WIB).',
                     onTap: () {},
                   ),
                   _FAQItem(
-                    question: 'Aplikasi tidak dapat dibuka, apa yang harus saya lakukan?',
-                    answer: 'Coba restart perangkat Anda. Jika masalah berlanjut, coba hapus cache aplikasi atau reinstall aplikasi. Jika masih bermasalah, hubungi dukungan kami.',
+                    question:
+                        'Aplikasi tidak dapat dibuka, apa yang harus saya lakukan?',
+                    answer:
+                        'Coba restart perangkat Anda. Jika masalah berlanjut, coba hapus cache aplikasi atau reinstall aplikasi. Jika masih bermasalah, hubungi dukungan kami.',
                     onTap: () {},
                   ),
                   _FAQItem(
                     question: 'Bagaimana cara melaporkan bug?',
-                    answer: 'Untuk melaporkan bug, buka menu Pengaturan > Bantuan > Laporkan Masalah. Sertakan tangkapan layar dan deskripsi lengkap tentang masalah yang Anda alami.',
+                    answer:
+                        'Untuk melaporkan bug, buka menu Pengaturan > Bantuan > Laporkan Masalah. Sertakan tangkapan layar dan deskripsi lengkap tentang masalah yang Anda alami.',
                     onTap: () {},
                   ),
                   _FAQItem(
                     question: 'Apakah data saya aman?',
-                    answer: 'Ya, kami menggunakan enkripsi end-to-end dan protokol keamanan terbaru untuk melindungi data Anda. Untuk informasi lebih lanjut, silakan lihat Kebijakan Privasi kami.',
+                    answer:
+                        'Ya, kami menggunakan enkripsi end-to-end dan protokol keamanan terbaru untuk melindungi data Anda. Untuk informasi lebih lanjut, silakan lihat Kebijakan Privasi kami.',
                     onTap: () {},
                   ),
                   TextButton(
@@ -275,7 +274,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 ],
               ),
             ),
-            
+
             // Video Tutorials
             Container(
               width: double.infinity,
@@ -285,10 +284,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 children: [
                   const Text(
                     'Tutorial Video',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 15),
                   SingleChildScrollView(
@@ -321,7 +317,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 ],
               ),
             ),
-            
+
             // Support Channels
             Container(
               width: double.infinity,
@@ -343,10 +339,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 children: [
                   const Text(
                     'Saluran Dukungan',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 15),
                   _SupportChannelItem(
@@ -379,7 +372,7 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 ],
               ),
             ),
-            
+
             // Feedback Section
             Container(
               width: double.infinity,
@@ -399,19 +392,13 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                   const SizedBox(height: 15),
                   const Text(
                     'Berikan Umpan Balik',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Bantu kami meningkatkan aplikasi dengan memberikan saran dan masukan',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
                   ),
                   const SizedBox(height: 15),
                   ElevatedButton(
@@ -419,22 +406,23 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
                       backgroundColor: const Color(0xFF2A9D8F),
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 30,
+                        vertical: 12,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     child: const Text(
                       'Kirim Umpan Balik',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
               ),
             ),
-            
+
             // Footer
             Container(
               width: double.infinity,
@@ -443,18 +431,12 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                 children: [
                   const Text(
                     'HomeService © 2025',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 5),
                   Text(
                     'Versi 1.0.0',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[400],
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey[400]),
                   ),
                 ],
               ),
@@ -471,7 +453,7 @@ class _QuickHelpButton extends StatelessWidget {
   final String title;
   final Color color;
   final VoidCallback onTap;
-  
+
   const _QuickHelpButton({
     required this.icon,
     required this.title,
@@ -494,11 +476,7 @@ class _QuickHelpButton extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                size: 32,
-                color: color,
-              ),
+              Icon(icon, size: 32, color: color),
               const SizedBox(height: 10),
               Text(
                 title,
@@ -519,7 +497,7 @@ class _FAQItem extends StatelessWidget {
   final String question;
   final String answer;
   final VoidCallback onTap;
-  
+
   const _FAQItem({
     required this.question,
     required this.answer,
@@ -548,10 +526,7 @@ class _FAQItem extends StatelessWidget {
           tilePadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           title: Text(
             question,
-            style: const TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 15,
-            ),
+            style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
           ),
           iconColor: const Color(0xFF2A9D8F),
           textColor: const Color(0xFF2A9D8F),
@@ -560,10 +535,7 @@ class _FAQItem extends StatelessWidget {
               padding: const EdgeInsets.only(left: 15, right: 15, bottom: 15),
               child: Text(
                 answer,
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: Colors.grey[700], fontSize: 14),
               ),
             ),
           ],
@@ -573,12 +545,11 @@ class _FAQItem extends StatelessWidget {
   }
 }
 
-
 class _VideoTutorialItem extends StatelessWidget {
   final String title;
   final String duration;
   final VoidCallback onTap;
-  
+
   const _VideoTutorialItem({
     required this.title,
     required this.duration,
@@ -636,7 +607,10 @@ class _VideoTutorialItem extends StatelessWidget {
                     bottom: 5,
                     right: 5,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.7),
                         borderRadius: BorderRadius.circular(4),
@@ -676,7 +650,7 @@ class _SupportChannelItem extends StatelessWidget {
   final String title;
   final String info;
   final VoidCallback onTap;
-  
+
   const _SupportChannelItem({
     required this.icon,
     required this.title,
@@ -693,11 +667,7 @@ class _SupportChannelItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: const Color(0xFF2A9D8F),
-              size: 22,
-            ),
+            Icon(icon, color: const Color(0xFF2A9D8F), size: 22),
             const SizedBox(width: 15),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -712,19 +682,12 @@ class _SupportChannelItem extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   info,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 13),
                 ),
               ],
             ),
             const Spacer(),
-            const Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-              color: Colors.grey,
-            ),
+            const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
           ],
         ),
       ),
