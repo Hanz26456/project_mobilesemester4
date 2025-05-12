@@ -44,7 +44,7 @@ class AboutAppScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            // Navigasi kembali
+            Navigator.pop(context);            // Navigasi kembali
           },
         ),
       ),
