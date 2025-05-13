@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/services/config.dart';
-import '../fitur/profil.dart'; // Pastikan Config.baseUrl sudah benar
+import '../fitur/profil.dart'; 
+import '../pekerja/profil.dart';// Pastikan Config.baseUrl sudah benar
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({super.key});
@@ -87,30 +88,44 @@ class _ChangePasswordState extends State<ChangePassword> {
     }
   }
 
-  void _showDialog(String title, String message, bool success) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(title),
-            content: Text(message),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Tutup dialog
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ProfileScreen(),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-    );
-  }
+void _showDialog(String title, String message, bool success) async {
+  final prefs = await SharedPreferences.getInstance();
+  final userType = prefs.getString('user_type'); // Ambil tipe user
+
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          child: const Text('OK'),
+          onPressed: () {
+            Navigator.of(context).pop(); // Tutup dialog
+            if (success) {
+              if (userType == 'customer') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfileScreen(),
+                  ),
+                );
+              } else if (userType == 'pekerja') {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePekerja(),
+                  ),
+                );
+              }
+            }
+          },
+        ),
+      ],
+    ),
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {

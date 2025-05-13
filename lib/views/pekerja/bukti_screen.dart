@@ -204,19 +204,6 @@ class _BuktiScreenState extends State<BuktiScreen> {
         elevation: 0,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.black54, width: 1.5),
-              ),
-              child: const Icon(Icons.arrow_back, color: Colors.black54, size: 20),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
         ),
         title: const Text(
           'Bukti Pekerjaan',
@@ -268,10 +255,8 @@ class _BuktiScreenState extends State<BuktiScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                Icons.cloud_upload_outlined,
-                                size: 60,
-                                color: const Color(0xFF3D8361),
+                              Image.asset(
+                                'assets/images/kbuktipekerja.png',
                               ),
                             ],
                           ),

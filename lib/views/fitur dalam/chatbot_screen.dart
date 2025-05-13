@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../data/models/chat_message.dart';
-import '../../data/models/quick_reply_option.dart';
 import '../../data/services/chatbot_service.dart';
 import '../../widgets/chatbubble.dart';
 
