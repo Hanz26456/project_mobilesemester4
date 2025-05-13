@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'bukti_screen.dart';
+import 'riwayat.dart';
 
 class Dashboardp extends StatefulWidget {
   const Dashboardp({super.key});
@@ -32,8 +34,8 @@ class _DashboardpState extends State<Dashboardp> {
     super.initState();
     _pages.addAll([
       _buatDashboardContent(),
-      const Center(child: Text('Bukti')),
-      const Center(child: Text('Riwayat')),
+      const BuktiScreen(),
+      const RiwayatScreen(),
       const Center(child: Text('Profil')),
     ]);
   }
@@ -132,45 +134,49 @@ class _DashboardpState extends State<Dashboardp> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: Colors.grey[100],
-    appBar: AppBar(
-      automaticallyImplyLeading: false,
-      backgroundColor: const Color(0xFF3D8361),
-      elevation: 0,
-      centerTitle: true,
-      title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 16),
-        child: CircleAvatar(
-          backgroundColor: Colors.white,
-          radius: 40, // Increased size of the circle
-          child: Icon(Icons.account_circle, color: Colors.grey, size: 40), // Adjusted icon size
-        ),
+  Widget build(BuildContext context) {
+    // Determine whether to show AppBar based on selected page
+    bool showAppBar = (_selectedIndex == 0 || _selectedIndex == 3);
+    
+    return Scaffold(
+      backgroundColor: Colors.grey[100],
+      appBar: showAppBar
+          ? AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: const Color(0xFF3D8361),
+              elevation: 0,
+              centerTitle: true,
+              title: const Text('Dashboard', style: TextStyle(color: Colors.white)),
+              leading: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: CircleAvatar(
+                  backgroundColor: Colors.white,
+                  radius: 16, // Adjusted size
+                  child: Icon(Icons.account_circle, color: Colors.grey, size: 24),
+                ),
+              ),
+            )
+          : null, // Hide AppBar for BuktiScreen and RiwayatScreen
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.teal,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_photo_alternate),
+            label: 'Bukti',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outlined),
+            label: 'Profil',
+          ),
+        ],
       ),
-    ),
-    body: _pages[_selectedIndex],
-    bottomNavigationBar: BottomNavigationBar(
-      selectedItemColor: Colors.teal,
-      unselectedItemColor: Colors.grey,
-      currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
-      type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.add_photo_alternate),
-          label: 'Bukti',
-        ),
-        BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outlined),
-          label: 'Profil',
-        ),
-      ],
-    ),
-  );
-}
-
+    );
+  }
 }

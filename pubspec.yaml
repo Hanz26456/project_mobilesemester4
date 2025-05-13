@@ -17,6 +17,9 @@ dependencies:
   shared_preferences: ^2.2.2
   pdf: ^3.10.4
   printing: ^5.11.0
+  image_picker: ^1.0.7 
+  dotted_border: ^2.0.0
+  iconsax: ^0.0.8  
   
 
   # Ikon bawaan untuk iOS

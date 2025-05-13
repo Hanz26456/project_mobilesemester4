@@ -141,8 +141,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
   @override
   void initState() {
     super.initState();
+    _loadUserProfile();
     _animationController = AnimationController(
       vsync: this,
+
       duration: const Duration(milliseconds: 800),
     );
 
@@ -285,6 +287,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
                                   controller: _usernameController,
                                   icon: const Icon(Icons.person_outline),
                                   hint: 'Username',
+                                  labelText: 'Username',
                                   isEditing: _editingUsername,
                                   onEditTap: () {
                                     setState(() {
@@ -304,6 +307,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
                                   controller: _phoneController,
                                   icon: const Icon(Icons.phone_outlined),
                                   hint: 'No.telp',
+                                  labelText: 'No. Telepon',
                                   isEditing: _editingPhone,
                                   onEditTap: () {
                                     setState(() {
@@ -324,6 +328,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
                                   controller: _addressController,
                                   icon: const Icon(Icons.location_on_outlined),
                                   hint: 'Alamat',
+                                  labelText: 'Alamat',
                                   isEditing: _editingAddress,
                                   onEditTap: () {
                                     setState(() {
@@ -343,6 +348,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
                                   controller: _emailController,
                                   icon: const Icon(Icons.email_outlined),
                                   hint: 'Email',
+                                  labelText: 'Email',
                                   isEditing: _editingEmail,
                                   onEditTap: () {
                                     setState(() {
@@ -444,6 +450,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
     required TextEditingController controller,
     required Icon icon,
     required String hint,
+    required String labelText,
     required bool isEditing,
     required VoidCallback onEditTap,
     required String? Function(String?)? validator,
@@ -455,6 +462,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> with SingleTicker
           controller: controller,
           icon: icon,
           hint: hint,
+          labelText: labelText,  // Tambahkan parameter labelText
           keyboardType: keyboardType,
           validator: validator,
           enabled: isEditing,
