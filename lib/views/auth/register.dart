@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../theme/app_text_styles.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/primary_button.dart';
@@ -16,7 +17,6 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  // TextEditingController
   final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _emailController = TextEditingController();
@@ -26,8 +26,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _isRegistering = false; // Flag to disable the register button
-  String _selectedRole = 'customer'; // Default role
+  bool _isRegistering = false;
+  String _selectedRole = 'customer';
+
+  Future<void> _openGoogleMaps(String address) async {
+    final encodedAddress = Uri.encodeComponent(address);
+    final googleMapsUrl =
+        'https://www.google.com/maps/search/?api=1&query=$encodedAddress';
+
+    try {
+      final url = Uri.parse(googleMapsUrl);
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Tidak dapat membuka Google Maps: $e')),
+      );
+    }
+  }
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
@@ -38,7 +53,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         return;
       }
 
-      // Create request model including role
       final request = RegisterRequest(
         username: _usernameController.text,
         phone: _phoneController.text,
@@ -46,22 +60,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text,
         password: _passwordController.text,
         passwordConfirmation: _confirmPasswordController.text,
-        role: _selectedRole, // Add selected role to request
+        role: _selectedRole,
       );
 
       try {
         setState(() {
-          _isRegistering = true; // Disable register button
+          _isRegistering = true;
         });
 
-        // Call API to register
         final authService = AuthService();
         final success = await authService.register(request);
 
         if (success) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text('Register berhasil')));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('Register berhasil')));
           Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -74,7 +86,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
       } finally {
         setState(() {
-          _isRegistering = false; // Re-enable register button
+          _isRegistering = false;
         });
       }
     }
@@ -86,9 +98,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Wave Background (same as login)
           Positioned(
-            bottom: -40, // Wave offset
+            bottom: -40,
             left: 0,
             right: 0,
             child: SizedBox(
@@ -129,8 +140,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
           ),
-
-          // Main Content
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -140,13 +149,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     width: 300,
                     child: Form(
                       key: _formKey,
-                      autovalidateMode:
-                          AutovalidateMode
-                              .onUserInteraction, // Auto validate after user interaction
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Back Button
                           GestureDetector(
                             onTap: () {
                               Navigator.pop(context);
@@ -157,10 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               height: 40,
                             ),
                           ),
-
                           const SizedBox(height: 8),
-
-                          // Header
                           Text('Register', style: AppTextStyles.poppinsHeading),
                           const SizedBox(height: 4),
                           Text(
@@ -170,16 +173,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           const SizedBox(height: 24),
-
-                          // Username
                           CustomTextField(
                             controller: _usernameController,
                             hint: 'Username',
-                            validator:
-                                (value) =>
-                                    value?.isEmpty ?? true
-                                        ? 'Username wajib diisi'
-                                        : null,
+                            validator: (value) =>
+                                value?.isEmpty ?? true ? 'Username wajib diisi' : null,
                             icon: Image.asset(
                               'assets/images/img_male_user.png',
                               width: 20,
@@ -187,17 +185,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           const SizedBox(height: 12),
-
-                          // No.telp
                           CustomTextField(
                             controller: _phoneController,
                             hint: 'No.telp',
                             validator: (value) {
                               if (value?.isEmpty ?? true) {
                                 return 'Nomor telepon wajib diisi';
-                              } else if (!RegExp(
-                                r'^[0-9]+$',
-                              ).hasMatch(value!)) {
+                              } else if (!RegExp(r'^[0-9]+$').hasMatch(value!)) {
                                 return 'Nomor telepon hanya boleh angka';
                               } else if (value.length < 10) {
                                 return 'Nomor telepon minimal 10 digit';
@@ -211,42 +205,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           const SizedBox(height: 12),
-
-                          // Email
-                          CustomTextField(
-                            controller: _emailController,
-                            hint: 'Email',
-                            validator:
-                                (value) =>
-                                    value?.isEmpty ?? true
-                                        ? 'Email wajib diisi'
-                                        : null,
-                            icon: Image.asset(
-                              'assets/images/Letter.png',
-                              width: 20,
-                              height: 20,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-
-                          // Alamat
                           CustomTextField(
                             controller: _addressController,
                             hint: 'Alamat',
-                            validator:
-                                (value) =>
-                                    value?.isEmpty ?? true
-                                        ? 'Alamat wajib diisi'
-                                        : null,
+                            validator: (value) =>
+                                value?.isEmpty ?? true ? 'Alamat wajib diisi' : null,
                             icon: Image.asset(
                               'assets/images/img_address.png',
                               width: 20,
                               height: 20,
                             ),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.map, color: Colors.blue),
+                              onPressed: () {
+                                final address = _addressController.text;
+                                if (address.isNotEmpty) {
+                                  _openGoogleMaps(address);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Silakan isi alamat terlebih dahulu'),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
                           ),
                           const SizedBox(height: 12),
-
-                          // Password
                           CustomTextField(
                             controller: _passwordController,
                             hint: 'Password',
@@ -266,9 +251,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscurePassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
+                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
                                 color: Colors.grey,
                               ),
                               onPressed: () {
@@ -279,8 +262,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           const SizedBox(height: 12),
-
-                          // Confirm Password
                           CustomTextField(
                             controller: _confirmPasswordController,
                             hint: 'Konfirmasi Password',
@@ -300,22 +281,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscureConfirmPassword
-                                    ? Icons.visibility_off
-                                    : Icons.visibility,
+                                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
                                 color: Colors.grey,
                               ),
                               onPressed: () {
                                 setState(() {
-                                  _obscureConfirmPassword =
-                                      !_obscureConfirmPassword;
+                                  _obscureConfirmPassword = !_obscureConfirmPassword;
                                 });
                               },
                             ),
                           ),
                           const SizedBox(height: 12),
-
-                          // Role Dropdown
                           DropdownButtonFormField<String>(
                             value: _selectedRole,
                             decoration: InputDecoration(
@@ -327,16 +303,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 _selectedRole = newValue!;
                               });
                             },
-                            items:
-                                <String>[
-                                  'customer',
-                                  'worker',
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
+                            items: <String>['customer', 'worker']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Role wajib dipilih';
@@ -345,20 +318,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             },
                           ),
                           const SizedBox(height: 24),
-
-                          // Register Button
                           Center(
-                            child:
-                                _isRegistering
-                                    ? CircularProgressIndicator()
-                                    : SizedBox(
-                                      width: 250,
-                                      child: PrimaryButton(
-                                        label: 'Register',
-                                        onPressed:
-                                            _isRegistering ? null : _register,
-                                      ),
+                            child: _isRegistering
+                                ? CircularProgressIndicator()
+                                : SizedBox(
+                                    width: 250,
+                                    child: PrimaryButton(
+                                      label: 'Register',
+                                      onPressed: _register,
                                     ),
+                                  ),
                           ),
                           const SizedBox(height: 40),
                         ],

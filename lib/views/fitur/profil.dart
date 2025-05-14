@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import '../auth/login.dart';
 import '../fitur dalam/changepassword.dart';
-
+import '../fitur dalam/editprofil.dart';
+import '../fitur dalam/aboutapp.dart';
+import '../fitur dalam/pusatbantuan.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -10,11 +12,10 @@ class ProfileScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          // Tambahkan SingleChildScrollView untuk mengatasi overflow
           child: Padding(
             padding: const EdgeInsets.only(
               bottom: 16,
-            ), // Tambahkan padding di bawah
+            ),
             child: Column(
               children: [
                 // Header (Judul halaman)
@@ -63,9 +64,12 @@ class ProfileScreen extends StatelessWidget {
 
                 // Menu Items
                 _buildMenuItem(context, 'Edit Profil', Icons.edit_note, () {
-                  // Navigate to edit profile
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Edit Profil diklik')),
+                  // Navigate to edit profile screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EditProfileScreen(),
+                    ),
                   );
                 }),
 
@@ -85,24 +89,14 @@ class ProfileScreen extends StatelessWidget {
 
                 _buildMenuItem(
                   context,
-                  'Alamat Saya',
-                  Icons.location_on_outlined,
-                  () {
-                    // Navigate to addresses
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Alamat Saya diklik')),
-                    );
-                  },
-                ),
-
-                _buildMenuItem(
-                  context,
                   'Pusat Bantuan',
                   Icons.help_outline,
                   () {
-                    // Navigate to help center
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Pusat Bantuan diklik')),
+                     Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HelpCenterScreen(),
+                   ),
                     );
                   },
                 ),
@@ -112,9 +106,11 @@ class ProfileScreen extends StatelessWidget {
                   'Tentang Aplikasi',
                   Icons.info_outline,
                   () {
-                    // Navigate to about page
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Tentang Aplikasi diklik')),
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AboutAppScreen(),
+                   ),
                     );
                   },
                 ),
@@ -123,79 +119,73 @@ class ProfileScreen extends StatelessWidget {
 
                 // Logout Button
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey.shade100,
+  padding: const EdgeInsets.symmetric(horizontal: 16),
+  child: Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(8),
+      color: Colors.grey.shade100,
+    ),
+    child: ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.red.shade100,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(Icons.logout, color: Colors.red.shade600),
+      ),
+      title: Text(
+        'Log Out',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.red.shade600,
+        ),
+      ),
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Konfirmasi'),
+            content: const Text('Apakah Anda yakin ingin keluar?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Tutup dialog
+                  
+                  // Tampilkan snackbar
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Berhasil logout'),
                     ),
-                    child: ListTile(
-                      leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.red.shade100,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(Icons.logout, color: Colors.red.shade600),
-                      ),
-                      title: Text(
-                        'Log Out',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red.shade600,
-                        ),
-                      ),
-                      onTap: () {
-                        showDialog(
-                          context: context,
-                          builder:
-                              (context) => AlertDialog(
-                                title: const Text('Konfirmasi'),
-                                content: const Text(
-                                  'Apakah Anda yakin ingin keluar?',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text('Batal'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context); // Tutup dialog
-
-                                      // Tampilkan snackbar
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text('Berhasil logout'),
-                                        ),
-                                      );
-
-                                      // Pergi ke halaman Login
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder:
-                                              (context) =>
-                                                  LoginScreen(), // Ganti LoginPage dengan nama file login kamu
-                                        ),
-                                      );
-                                    },
-                                    child: Text(
-                                      'Ya, Keluar',
-                                      style: TextStyle(
-                                        color: Colors.red.shade600,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                        );
-                      },
+                  );
+                  
+                  // Pergi ke halaman Login
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LoginScreen(), // Ganti LoginPage dengan nama file login kamu
                     ),
+                  );
+                },
+                child: Text(
+                  'Ya, Keluar',
+                  style: TextStyle(
+                    color: Colors.red.shade600,
                   ),
                 ),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+  ),
+),
+
 
                 // Menghapus Spacer() yang menyebabkan overflow
               ],
