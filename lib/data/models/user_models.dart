@@ -17,16 +17,17 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'],
-      username: json['username'],
-      email: json['email'],
-      phone: json['phone'],
-      address: json['address'],
-      role: json['role'],
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      username: json['username'] ?? '',
+      email: json['email'] ?? '',
+      phone: json['phone'] ?? '',
+      address: json['address'] ?? '',
+      role: json['role'] ?? '',
     );
   }
 
-  // Menambahkan metode toJson
   Map<String, dynamic> toJson() {
     return {
       'id': id,

@@ -81,7 +81,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
               children: [
                 // Logo
                 Image.asset(
-                  "assets/images/logo.png",
+                  "assets/images/logoputih.png",
                   width: 120,
                   height: 120,
                 ),

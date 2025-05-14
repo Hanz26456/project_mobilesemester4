@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
-  final String hint;
+  final String? hint;
+  final String? labelText; 
   final Widget icon;
   final bool obscureText;
   final Widget? suffixIcon;
@@ -9,19 +10,22 @@ class CustomTextField extends StatelessWidget {
   final bool autofocus;
   final FormFieldValidator<String>? validator;
   final TextInputType? keyboardType;
-  final bool enabled; // 🔹 Tambahkan ini
+  final bool readOnly;
+  final bool enabled;
 
   const CustomTextField({
     super.key,
-    required this.hint,
+    this.hint,
     required this.icon,
     this.obscureText = false,
     this.suffixIcon,
+    this.labelText, 
     this.controller,
     this.autofocus = false,
     this.validator,
+    this.readOnly = false,
     this.keyboardType,
-    this.enabled = true, // 🔹 Default true
+    this.enabled = true,
   });
 
   @override
@@ -31,11 +35,27 @@ class CustomTextField extends StatelessWidget {
       controller: controller,
       obscureText: obscureText,
       validator: validator,
+      readOnly: readOnly,
       keyboardType: keyboardType,
-      enabled: enabled, // 🔹 Tambahkan ini
+      enabled: enabled,
+      // Tambahkan style agar teks input terlihat jelas
+      style: const TextStyle(
+        fontFamily: 'Inter',
+        fontSize: 16,
+        color: Colors.black87,
+      ),
       decoration: InputDecoration(
         hintText: hint,
+        // Tambahkan labelText yang selalu terlihat
+        labelText: labelText ?? hint,
+        // Pastikan label selalu terlihat
+        floatingLabelBehavior: FloatingLabelBehavior.always,
         hintStyle: const TextStyle(fontFamily: 'Inter', color: Colors.grey),
+        labelStyle: const TextStyle(
+          fontFamily: 'Inter', 
+          color: Colors.black54, 
+          fontWeight: FontWeight.w500
+        ),
         prefixIcon: Padding(
           padding: const EdgeInsets.all(10.0),
           child: icon,
@@ -49,11 +69,17 @@ class CustomTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.grey, width: 1),
         ),
+        // Tambahkan disabledBorder
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Colors.grey, width: 1),
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
-        fillColor: Colors.grey[100],
+        // Ubah warna latar belakang berdasarkan enabled
+        fillColor: enabled ? Colors.grey[100] : Colors.grey[50],
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
       ),
     );

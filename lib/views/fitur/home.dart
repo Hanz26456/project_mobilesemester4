@@ -9,6 +9,7 @@ import '../../data/services/service_service.dart';
 import '../../data/models/service_model.dart';
 import '../../data/services/auth_service.dart'; // Import AuthService
 import '../../data/models/user_models.dart'; // Import UserModel sesuai dengan struktur Anda
+import '../fitur dalam/chatbot_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -51,9 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const ServicesScreen(),
       const HistoryScreen(),
       const ProfileScreen(),
-      const Center(
-        child: Text('Halaman Riwayat'),
-      ),
+      const Center(child: Text('Halaman Riwayat')),
     ];
   }
 
@@ -62,32 +61,36 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.teal,
-        unselectedItemColor: Colors.grey,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Layanan',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outlined),
-            label: 'Profil',
-          ),
-        ],
-      ),
-    );
-  }
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: _pages[_selectedIndex],
+    bottomNavigationBar: BottomNavigationBar(
+      selectedItemColor: Colors.teal,
+      unselectedItemColor: Colors.grey,
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+      type: BottomNavigationBarType.fixed,
+      items: const [
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
+        BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Layanan'),
+        BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
+        BottomNavigationBarItem(icon: Icon(Icons.person_outlined), label: 'Profil'),
+      ],
+    ),
+    floatingActionButton: FloatingActionButton(
+      tooltip: 'Buka Chatbot',
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ChatScreen()),
+        );
+      },
+      backgroundColor: Colors.teal,
+      child: const Icon(Icons.smart_toy),
+    ),
+  );
+}
 }
 
 // Halaman beranda dengan data dari API
@@ -101,7 +104,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<ServiceModel> popularServices = [];
   bool isLoadingPopular = false;
-  
+
   // Tambahkan untuk user
   UserModel? currentUser;
   bool isLoadingUser = false;
@@ -121,7 +124,7 @@ class _HomePageState extends State<HomePage> {
       // Ambil data user dari SharedPreferences yang disimpan saat login
       final prefs = await SharedPreferences.getInstance();
       String? userJson = prefs.getString('user_data');
-      
+
       if (userJson != null) {
         Map<String, dynamic> userData = json.decode(userJson);
         setState(() {
@@ -168,22 +171,24 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       isLoadingUser
                           ? const SizedBox(
-                              width: 150,
-                              child: Text(
-                                'Memuat...',
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            )
-                          : Text(
-                              'Halo, ${currentUser?.username ?? 'Pengguna'}',
-                              style: const TextStyle(
+                            width: 150,
+                            child: Text(
+                              'Memuat...',
+                              style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                          )
+                          : Text(
+                            currentUser != null
+                                ? 'Halo, ${currentUser!.username}'
+                                : 'Memuat data pengguna...',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                       Stack(
                         children: [
                           IconButton(
@@ -715,4 +720,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

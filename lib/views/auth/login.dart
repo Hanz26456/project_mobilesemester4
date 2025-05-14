@@ -9,6 +9,8 @@ import '../../data/services/auth_service.dart';
 import '../../data/models/login_request.dart';
 import '../auth/forgotpassword.dart';
 import 'register.dart';
+import 'dart:convert';
+import '../pekerja/dashboard.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -43,16 +45,49 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setInt('user_id', user.id);
       await prefs.setString('user_address', user.address);
       await prefs.setString('email', user.email);
+      await prefs.setString('user_data', json.encode(user.toJson()));
+      await prefs.setString('role', user.role);
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+      // 🟢 Navigasi berdasarkan role user
+      if (user.role == 'worker') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Dashboardp()),
+        );
+      } else if (user.role == 'customer') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Role tidak dikenali: ${user.role}')),
+        );
+      }
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Login gagal, coba lagi!")));
+      _showLoginErrorDialog('Email atau password salah.');
     }
+  }
+
+  // Fungsi untuk menampilkan AlertDialog error saat login
+  void _showLoginErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login Gagal'),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();  // Menutup dialog
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -75,10 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.bottomRight,
                     child: SvgPicture.asset(
                       'assets/svg/Vector (2).svg',
-                      width:
-                          MediaQuery.of(
-                            context,
-                          ).size.width, // Sesuaikan dengan lebar layar
+                      width: MediaQuery.of(context).size.width, // Sesuaikan dengan lebar layar
                       fit: BoxFit.cover, // Pastikan tidak terdistorsi
                     ),
                   ),
@@ -220,8 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder:
-                                        (context) => const ForgotPasswordPage(),
+                                    builder: (context) => const ForgotPasswordPage(),
                                   ),
                                 );
                                 // Aksi navigasi ke halaman forgot password
@@ -265,8 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder:
-                                        (context) => const RegisterScreen(),
+                                    builder: (context) => const RegisterScreen(),
                                   ),
                                 );
                               },

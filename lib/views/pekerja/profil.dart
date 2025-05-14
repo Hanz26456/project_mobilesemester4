@@ -3,19 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../auth/login.dart';
 import '../fitur dalam/changepassword.dart';
-import '../fitur dalam/editprofil.dart';
-import '../fitur dalam/aboutapp.dart';
-import '../fitur dalam/pusatbantuan.dart';
 import '../../data/models/user_models.dart'; // pastikan ini benar
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class ProfilePekerja extends StatefulWidget {
+  const ProfilePekerja({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<ProfilePekerja> createState() => _ProfilePekerjaState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfilePekerjaState extends State<ProfilePekerja> {
   UserModel? currentUser;
 
   @override
@@ -97,21 +94,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
 
                         const SizedBox(height: 32),
-
-                        _buildMenuItem(
-                          context,
-                          'Edit Profil',
-                          Icons.edit_note,
-                          () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const EditProfileScreen(),
-                              ),
-                            );
-                          },
-                        ),
-
                         _buildMenuItem(
                           context,
                           'Ganti Password',
@@ -121,34 +103,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const ChangePassword(),
-                              ),
-                            );
-                          },
-                        ),
-
-                        _buildMenuItem(
-                          context,
-                          'Pusat Bantuan',
-                          Icons.help_outline,
-                          () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HelpCenterScreen(),
-                              ),
-                            );
-                          },
-                        ),
-
-                        _buildMenuItem(
-                          context,
-                          'Tentang Aplikasi',
-                          Icons.info_outline,
-                          () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const AboutAppScreen(),
                               ),
                             );
                           },
@@ -187,7 +141,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 final prefs =
                                     await SharedPreferences.getInstance();
                                 await prefs.remove('user_data');
-
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
