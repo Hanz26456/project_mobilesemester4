@@ -314,38 +314,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           const SizedBox(height: 12),
-
-                          // Role Dropdown
-                          DropdownButtonFormField<String>(
-                            value: _selectedRole,
-                            decoration: InputDecoration(
-                              labelText: 'Role',
-                              prefixIcon: Icon(Icons.account_circle),
-                            ),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _selectedRole = newValue!;
-                              });
-                            },
-                            items:
-                                <String>[
-                                  'customer',
-                                  'worker',
-                                ].map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value),
-                                  );
-                                }).toList(),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Role wajib dipilih';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 24),
-
                           // Register Button
                           Center(
                             child:
