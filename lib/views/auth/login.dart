@@ -47,6 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setString('email', user.email);
       await prefs.setString('user_data', json.encode(user.toJson()));
       await prefs.setString('role', user.role);
+      
 
       // 🟢 Navigasi berdasarkan role user
       if (user.role == 'worker') {
