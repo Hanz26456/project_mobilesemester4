@@ -4,8 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:home_service/views/auth/login.dart'; 
 import '../../data/services/config.dart';
-import '../fitur/profil.dart'; 
-import '../pekerja/profil.dart';// Pastikan Config.baseUrl sudah benar
+import '../auth/login.dart'; // Pastikan Config.baseUrl sudah benar
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({super.key});
@@ -209,7 +208,11 @@ void _showDialog(String title, String message, bool success) async {
                   onPressed: _changePassword,
                   child: const Text(
                     'Simpan',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ),
