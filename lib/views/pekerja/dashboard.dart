@@ -334,31 +334,7 @@ class _DashboardpState extends State<Dashboardp>
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Container(
-            height: 50,
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white24,
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: Row(
-              children: const [
-                Icon(Icons.search, color: Colors.white),
-                SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    "Cari pekerjaan atau lokasi...",
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(8),
-                  child: Icon(Icons.tune, color: Color(0xFF3D8361), size: 18),
-                ),
-              ],
-            ),
-          ),
+         
         ],
       ),
     );
