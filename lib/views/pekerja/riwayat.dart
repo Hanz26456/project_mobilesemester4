@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/WorkerOrderHistoryModel.dart';
 import '../../data/services/worker_history_service.dart';
@@ -44,41 +42,69 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     }
   }
 
+  List<WorkerOrderHistory> get _tabKiriRiwayat => _riwayat
+      .where((e) => e.status == 'proses' || e.status == 'selesai_pengerjaan')
+      .toList();
+
+  List<WorkerOrderHistory> get _tabKananRiwayat => _riwayat
+      .where((e) => e.status == 'pending_setoran' || e.status == 'selesai')
+      .toList();
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: SafeArea(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                child: Center(
+                  child: Text(
                     'Pekerjaan Saya',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
+                ),
+              ),
+              const TabBar(
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.grey,
+                indicatorColor: Colors.blue,
+                tabs: [
+                  Tab(text: 'Proses & Selesai Pengerjaan'),
+                  Tab(text: 'Pending Setoran & Selesai'),
                 ],
               ),
-            ),
-            Expanded(
-              child: _loading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _riwayat.isEmpty
-                      ? const Center(child: Text('Belum ada pekerjaan yang ditugaskan.'))
-                      : RefreshIndicator(
-                          onRefresh: _loadRiwayat,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                            itemCount: _riwayat.length,
-                            itemBuilder: (context, idx) => _buildRiwayatItem(_riwayat[idx]),
-                          ),
-                        ),
-            ),
-          ],
+              Expanded(
+                child: _loading
+                    ? const Center(child: CircularProgressIndicator())
+                    : TabBarView(
+                        children: [
+                          _buildRiwayatList(_tabKiriRiwayat),
+                          _buildRiwayatList(_tabKananRiwayat),
+                        ],
+                      ),
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildRiwayatList(List<WorkerOrderHistory> list) {
+    if (list.isEmpty) {
+      return const Center(child: Text('Tidak ada data.'));
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadRiwayat,
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+        itemCount: list.length,
+        itemBuilder: (context, idx) => _buildRiwayatItem(list[idx]),
       ),
     );
   }
@@ -109,7 +135,8 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Service: $serviceName', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Service: $serviceName',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             Text('Tanggal Pesanan: ${_formatDateTime(item.tanggalPemesanan)}'),
             Text('Total Pembayaran: Rp${item.totalPembayaran}'),
