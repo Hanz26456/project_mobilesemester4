@@ -9,17 +9,19 @@ import '../../data/services/auth_service.dart'; // Import AuthService
 import '../../data/models/user_models.dart'; // Import UserModel sesuai dengan struktur Anda
 import '../../data/models/order_pekerja_model.dart';
 import '../../data/services/order_pekerja_service.dart';
+import 'dart:math';
 import '../../data/models/job_status.dart';
 import '../../data/services/job_status_service.dart';
-import 'dart:math';
 import '../../data/models/worker_statistik.dart';
 import '../../data/services/WorkerStatistikService.dart';
+import 'package:gap/gap.dart';
 
 class Dashboardp extends StatefulWidget {
   const Dashboardp({super.key});
 
   @override
   State<Dashboardp> createState() => _DashboardpState();
+  
 }
 
 class _DashboardpState extends State<Dashboardp>
@@ -198,145 +200,121 @@ class _DashboardpState extends State<Dashboardp>
     }
   }
 
-  Widget _buatDashboardContent() {
-    if (isLoadingUser || _isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (_error != null) {
-      return Center(child: Text('Terjadi kesalahan: $_error'));
-    }
-
-    if (_statistik == null || currentUser == null) {
-      return const Center(child: Text('Data tidak tersedia.'));
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.center,
-          colors: [
-            const Color(0xFF3D8361),
-            const Color(0xFF3D8361).withOpacity(0.8),
-          ],
-        ),
-      ),
-      child: SafeArea(
-        child: Column(
-          children: [
-            _buildTopHeader(), // Pastikan ini bisa jalan meski username belum ada
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.only(top: 20),
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 10,
-                      offset: Offset(0, -5),
-                    ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
-                  ),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildStatusSummary(), // ← gunakan _statistik di sini?
-                        _buildSectionHeader(
-                          "Pekerjaan Hari Ini",
-                          "Lihat Semua",
-                        ),
-                        _buildJobsList(),
-                        _buildSectionHeader("Analisis Kinerja", "Detail"),
-                        _buildPerformanceWidget(), // ← gunakan _statistik di sini?
-                        const SizedBox(height: 100), // Bottom spacing
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
+  // Implementasi _buildTopHeader yang sebelumnya error
   Widget _buildTopHeader() {
-    print('Building header dengan username: $username');
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      child: Column(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Selamat Datang,",
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
-                  ),
-                  const SizedBox(height: 4),
-                  isLoadingUser
-                      ? const Text(
-                        "Memuat...",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
-                        ),
-                      )
-                      : Text(
-                        "Halo, ${currentUser?.username ?? 'Pengguna'}",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 22,
-                        ),
-                      ),
-                ],
+              Text(
+                'Selamat datang kembali', // Pindahkan ke atas
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white.withOpacity(0.9),
+                ),
               ),
-              GestureDetector(
-                onTap: () {
-                  _onItemTapped(3);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: const BoxDecoration(
-                    color: Colors.white24,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const CircleAvatar(
-                    radius: 24,
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.person,
-                      color: Color(0xFF3D8361),
-                      size: 28,
-                    ),
-                  ),
+              const SizedBox(height: 4), // Tambahkan spacing kecil
+              Text(
+                'Halo, $username!', // Pindahkan ke bawah
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ],
           ),
-         
+          Container(
+            height: 50,
+            width: 50,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.person,
+              color: Color(0xFF3D8361),
+              size: 30,
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  Widget _buatDashboardContent() {
+    print('''
+Build Dashboard Content:
+- isLoadingUser: $isLoadingUser
+- _isLoading: $_isLoading
+- _error: $_error
+- _statistik: ${_statistik?.toString()}
+- currentUser: ${currentUser?.toString()}
+''');
+    // Tampilkan loading indicator secara jelas di tengah layar
+    if (isLoadingUser || _isLoading) {
+      return Center(
+        child: CircularProgressIndicator(
+          color: Color(0xFF3D8361),
+        ),
+      );
+    }
+
+    // Tampilkan error message secara jelas
+    if (_error != null) {
+      return Center(
+        child: Padding(
+          padding: EdgeInsets.all(20),
+          child: Text(
+            'Error: $_error',
+            style: TextStyle(color: Colors.red),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return Stack(
+      children: [
+        // Background gradient - kurangi heightnya
+        Container(
+          height: MediaQuery.of(context).size.height * 0.25, // Diperkecil
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                const Color(0xFF3D8361),
+                const Color(0xFF3D8361),
+                const Color(0xFF3D8361).withOpacity(0.9),
+              ],
+            ),
+          ),
+        ),
+        
+        // Konten utama
+        SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 40), // Tambahkan jarak dari atas di sini
+              _buildTopHeader(),
+              const SizedBox(height: 20),
+              _buildPerformanceWidget(),
+              _buildStatusSummary(),
+              _buildSectionHeader(
+                "Pekerjaan Hari Ini",
+                "Lihat Semua",
+              ),
+              _buildJobsList(),
+              const SizedBox(height: 20),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -523,22 +501,22 @@ class _DashboardpState extends State<Dashboardp>
   }
 
   Widget _buildJobCard(OrderPekerja order) {
+
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) => JobDetailScreen(
-                  userName: order.namaUser,
-                  userAddress: order.alamat,
-                  serviceName: order.service,
-                  status: order.status,
-                  tanggal: order.tanggalPemesanan,
-                  // Ganti jika data provider tersedia
-                ),
-          ),
-        );
+       Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => JobDetailScreen(
+      userName: order.namaUser,
+      userAddress: order.alamat,
+      serviceName: order.service,
+      status: order.status,
+      tanggal: order.tanggalPemesanan,
+      phone: order.phone, // harusnya ini berisi '085388393834'
+    ),
+  ),
+);
       },
       child: Container(
         width: 160,
@@ -632,7 +610,7 @@ class _DashboardpState extends State<Dashboardp>
   Widget _buildPerformanceWidget() {
     if (_isLoading) {
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
@@ -653,7 +631,7 @@ class _DashboardpState extends State<Dashboardp>
 
     if (_error != null) {
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
@@ -689,7 +667,7 @@ class _DashboardpState extends State<Dashboardp>
 
     if (_statistik == null) {
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 20),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         padding: const EdgeInsets.all(15),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
@@ -700,7 +678,7 @@ class _DashboardpState extends State<Dashboardp>
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
@@ -781,30 +759,6 @@ class _DashboardpState extends State<Dashboardp>
                 'Total Orders',
               ),
             ],
-          ),
-          const SizedBox(height: 15),
-          GestureDetector(
-            onTap: () {
-              // Navigate to detail statistik page
-              // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailStatistikPage()));
-            },
-            child: Container(
-              height: 40,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Center(
-                child: Text(
-                  'Lihat Detail Statistik',
-                  style: TextStyle(
-                    color: Color(0xFF3D8361),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
           ),
         ],
       ),
