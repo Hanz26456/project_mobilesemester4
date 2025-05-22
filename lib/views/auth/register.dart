@@ -82,9 +82,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
+return Scaffold(
+  backgroundColor: Colors.white,
+  resizeToAvoidBottomInset: false,
+  body: Stack(
+
         children: [
           // Wave Background (same as login)
           Positioned(
@@ -132,11 +134,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
           // Main Content
           SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(top: 30, bottom: 125),
-                child: Center(
-                  child: SizedBox(
+            child: Padding(
+              padding: EdgeInsets.only(
+                top: 30,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+                child: SingleChildScrollView(
+                  child: Center(
+                    child: SizedBox(
+
                     width: 300,
                     child: Form(
                       key: _formKey,

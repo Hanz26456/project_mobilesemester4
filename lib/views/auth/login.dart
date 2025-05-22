@@ -93,9 +93,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
+return Scaffold(
+  backgroundColor: Colors.white,
+  resizeToAvoidBottomInset: false,
+  body: Stack(
+
         children: [
           /// 🟢 Background Wave pakai 3 SVG
           Positioned(
@@ -149,12 +151,16 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
 
           /// 🔵 Konten utama
-          SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(vertical: 32),
-                child: Center(
-                  child: SizedBox(
+SafeArea(
+  child: Padding(
+    padding: EdgeInsets.only(
+      top: 32,
+      bottom: MediaQuery.of(context).viewInsets.bottom,
+    ),
+    child: SingleChildScrollView(
+      child: Center(
+        child: SizedBox(
+
                     width: 300,
                     child: Column(
                       children: [
