@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class JobDetailScreen extends StatelessWidget {
   final String userName;
@@ -6,6 +7,7 @@ class JobDetailScreen extends StatelessWidget {
   final String serviceName;
   final String status;
   final String tanggal;
+  final String phone;
 
   const JobDetailScreen({
     Key? key,
@@ -14,6 +16,7 @@ class JobDetailScreen extends StatelessWidget {
     required this.serviceName,
     required this.status,
     required this.tanggal,
+    required this.phone,
   }) : super(key: key);
 
   Color _getStatusColor() {
@@ -31,8 +34,39 @@ class JobDetailScreen extends StatelessWidget {
     }
   }
 
+  Future<void> openWhatsApp({
+    required String phoneNumber,
+    String? message,
+  }) async {
+    phoneNumber = phoneNumber.trim();
+    print("📞 Nomor yang diterima: $phoneNumber");
+
+    if (phoneNumber.isEmpty) {
+      print("❌ Nomor telepon kosong");
+      return;
+    }
+
+    // Tidak perlu validasi RegExp karena formatPhoneNumber sudah membersihkan
+    // Ubah angka 0 di awal menjadi 62 (opsional, karena sudah dilakukan di formatPhoneNumber)
+    if (phoneNumber.startsWith('0')) {
+      phoneNumber = '62${phoneNumber.substring(1)}';
+    }
+
+    final urlString =
+        'https://wa.me/$phoneNumber${message != null ? '?text=${Uri.encodeComponent(message)}' : ''}';
+    print("🔗 URL WhatsApp yang dibuka: $urlString");
+
+    try {
+      final uri = Uri.parse(urlString);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (e) {
+      print("❌ Gagal membuka WhatsApp: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('📞 Nomor telepon dari constructor: $phone');
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -71,22 +105,22 @@ class JobDetailScreen extends StatelessWidget {
             children: [
               // Header
               _buildHeader(context),
-              
+
               // Status card
               _buildStatusCard(),
-              
+
               const SizedBox(height: 16),
-              
+
               // Client info card
               _buildClientCard(),
-              
+
               const SizedBox(height: 16),
-              
+
               // Service info card
               _buildServiceCard(),
-              
+
               const SizedBox(height: 24),
-              
+
               // Action button - Detail Pesanan
               _buildActionButton(context),
             ],
@@ -214,12 +248,29 @@ class JobDetailScreen extends StatelessWidget {
                 // Animasi untuk refresh status
               },
               icon: Icon(Icons.refresh, size: 16, color: Colors.green[700]),
-              label: Text('Refresh', style: TextStyle(color: Colors.green[700])),
+              label: Text(
+                'Refresh',
+                style: TextStyle(color: Colors.green[700]),
+              ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String formatPhoneNumber(String? phone) {
+    if (phone == null || phone.trim().isEmpty) {
+      print("❌ Input phone kosong atau null");
+      return "";
+    }
+    phone = phone.trim();
+    // Hapus semua karakter non-angka
+    phone = phone.replaceAll(RegExp(r'[^\d]'), '');
+    if (phone.startsWith('0')) {
+      return '62${phone.substring(1)}';
+    }
+    return phone;
   }
 
   Widget _buildClientCard() {
@@ -246,11 +297,7 @@ class JobDetailScreen extends StatelessWidget {
                 CircleAvatar(
                   backgroundColor: Colors.green.withOpacity(0.1),
                   radius: 24,
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.green[700],
-                    size: 24,
-                  ),
+                  child: Icon(Icons.person, color: Colors.green[700], size: 24),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -267,49 +314,58 @@ class JobDetailScreen extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         'Klien',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    // Aksi untuk menghubungi klien
-                  },
-                  icon: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.phone,
-                      color: Colors.green,
-                      size: 20,
-                    ),
-                  ),
-                ),
+              IconButton(
+  onPressed: phone.isEmpty
+      ? null
+      : () {
+          print("📱 Nilai phone sebelum format: $phone");
+          final formattedPhone = formatPhoneNumber(phone);
+          print("📱 Nilai formattedPhone: $formattedPhone");
+          if (formattedPhone.isEmpty) {
+            Builder(
+              builder: (BuildContext snackBarContext) {
+                ScaffoldMessenger.of(snackBarContext).showSnackBar(
+                  const SnackBar(content: Text("Nomor telepon tidak valid")),
+                );
+                return const SizedBox.shrink();
+              },
+            );
+            return;
+          }
+          openWhatsApp(
+            phoneNumber: formattedPhone,
+            message: "Halo, saya ingin bertanya",
+          );
+        },
+  icon: Container(
+    padding: const EdgeInsets.all(8),
+    decoration: BoxDecoration(
+      color: Colors.green.withOpacity(0.1),
+      shape: BoxShape.circle,
+    ),
+    child: Image.asset(
+      'assets/images/wa.jpg',
+      width: 20,
+      height: 20,
+    ),
+  ),
+),
               ],
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                Icon(
-                  Icons.location_on,
-                  size: 18,
-                  color: Colors.grey[600],
-                ),
+                Icon(Icons.location_on, size: 18, color: Colors.grey[600]),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     userAddress,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[700],
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
                   ),
                 ),
               ],
@@ -341,10 +397,7 @@ class JobDetailScreen extends StatelessWidget {
           children: [
             const Text(
               'Informasi Layanan',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             _buildInfoRow(
@@ -360,18 +413,19 @@ class JobDetailScreen extends StatelessWidget {
               valueColor: _getStatusColor(),
             ),
             const Divider(height: 24),
-            _buildInfoRow(
-              Icons.calendar_today,
-              'Tanggal',
-              tanggal,
-            ),
+            _buildInfoRow(Icons.calendar_today, 'Tanggal', tanggal),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value, {Color? valueColor}) {
+  Widget _buildInfoRow(
+    IconData icon,
+    String label,
+    String value, {
+    Color? valueColor,
+  }) {
     return Row(
       children: [
         Container(
@@ -380,11 +434,7 @@ class JobDetailScreen extends StatelessWidget {
             color: Colors.green.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Icon(
-            icon,
-            size: 16,
-            color: Colors.green[700],
-          ),
+          child: Icon(icon, size: 16, color: Colors.green[700]),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -393,10 +443,7 @@ class JobDetailScreen extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
               const SizedBox(height: 4),
               Text(
@@ -446,7 +493,7 @@ class JobDetailScreen extends StatelessWidget {
       ),
     );
   }
-  
+
   Widget _buildDetailBottomSheet(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
@@ -472,10 +519,7 @@ class JobDetailScreen extends StatelessWidget {
                 children: [
                   const Text(
                     'Detail Pesanan',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Container(
@@ -490,24 +534,30 @@ class JobDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // Informasi Layanan
             _buildDetailSection(
               title: 'Informasi Layanan',
               children: [
                 _buildDetailRow('Nama Layanan', serviceName),
                 const SizedBox(height: 12),
-                _buildDetailRow('Status', status, 
+                _buildDetailRow(
+                  'Status',
+                  status,
                   valueColor: _getStatusColor(),
-                  valueIcon: Icon(_getStatusIcon(), size: 16, color: _getStatusColor())
+                  valueIcon: Icon(
+                    _getStatusIcon(),
+                    size: 16,
+                    color: _getStatusColor(),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 _buildDetailRow('Tanggal Pesanan', tanggal),
               ],
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Informasi Klien
             _buildDetailSection(
               title: 'Informasi Klien',
@@ -517,9 +567,9 @@ class JobDetailScreen extends StatelessWidget {
                 _buildDetailRow('Alamat', userAddress),
               ],
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // Tombol Close
             SizedBox(
               width: double.infinity,
@@ -541,7 +591,7 @@ class JobDetailScreen extends StatelessWidget {
       ),
     );
   }
-  
+
   IconData _getStatusIcon() {
     switch (status.toLowerCase()) {
       case 'selesai':
@@ -556,15 +606,18 @@ class JobDetailScreen extends StatelessWidget {
         return Icons.info;
     }
   }
-  
-  Widget _buildDetailSection({required String title, required List<Widget> children}) {
+
+  Widget _buildDetailSection({
+    required String title,
+    required List<Widget> children,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
           style: TextStyle(
-            fontSize: 16, 
+            fontSize: 16,
             fontWeight: FontWeight.bold,
             color: Colors.green[800],
           ),
@@ -583,8 +636,13 @@ class JobDetailScreen extends StatelessWidget {
       ],
     );
   }
-  
-  Widget _buildDetailRow(String label, String value, {Color? valueColor, Widget? valueIcon}) {
+
+  Widget _buildDetailRow(
+    String label,
+    String value, {
+    Color? valueColor,
+    Widget? valueIcon,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -592,19 +650,13 @@ class JobDetailScreen extends StatelessWidget {
           width: 120,
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
           ),
         ),
         Expanded(
           child: Row(
             children: [
-              if (valueIcon != null) ...[
-                valueIcon,
-                const SizedBox(width: 6),
-              ],
+              if (valueIcon != null) ...[valueIcon, const SizedBox(width: 6)],
               Flexible(
                 child: Text(
                   value.isNotEmpty ? value : 'Tidak tersedia',

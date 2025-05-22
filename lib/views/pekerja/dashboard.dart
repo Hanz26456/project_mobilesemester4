@@ -501,22 +501,22 @@ Build Dashboard Content:
   }
 
   Widget _buildJobCard(OrderPekerja order) {
+
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) => JobDetailScreen(
-                  userName: order.namaUser,
-                  userAddress: order.alamat,
-                  serviceName: order.service,
-                  status: order.status,
-                  tanggal: order.tanggalPemesanan,
-                  // Ganti jika data provider tersedia
-                ),
-          ),
-        );
+       Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => JobDetailScreen(
+      userName: order.namaUser,
+      userAddress: order.alamat,
+      serviceName: order.service,
+      status: order.status,
+      tanggal: order.tanggalPemesanan,
+      phone: order.phone, // harusnya ini berisi '085388393834'
+    ),
+  ),
+);
       },
       child: Container(
         width: 160,
