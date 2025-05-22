@@ -1,7 +1,7 @@
 name: home_service
 description: "A new Flutter project."
 
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -17,12 +17,14 @@ dependencies:
   shared_preferences: ^2.2.2
   pdf: ^3.10.4
   printing: ^5.11.0
-  image_picker: ^1.0.7 
+  image_picker: ^1.0.7
   dotted_border: ^2.0.0
   iconsax: ^0.0.8
-  dio: ^5.4.0   
+  dio: ^5.4.0
   gap: ^3.0.1
-  
+  flutter_image_compress: ^2.4.0
+  path_provider: ^2.1.2
+    
 
   # Ikon bawaan untuk iOS
   cupertino_icons: ^1.0.8
@@ -37,11 +39,11 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/  # Folder gambar
+    - assets/images/ # Folder gambar
     - assets/fonts/
     - assets/svg/Vector.svg
     - assets/svg/Vector (1).svg
-    - assets/svg/Vector (2).svg  # Folder font
+    - assets/svg/Vector (2).svg # Folder font
 
   fonts:
     - family: Inter
@@ -72,4 +74,3 @@ flutter:
         - asset: assets/fonts/Poppins-SemiBold.ttf
           weight: 500
           style: italic
-       
