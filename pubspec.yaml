@@ -19,7 +19,9 @@ dependencies:
   printing: ^5.11.0
   image_picker: ^1.0.7 
   dotted_border: ^2.0.0
-  iconsax: ^0.0.8  
+  iconsax: ^0.0.8
+  dio: ^5.4.0   
+  gap: ^3.0.1
   
 
   # Ikon bawaan untuk iOS

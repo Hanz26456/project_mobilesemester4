@@ -1,71 +1,81 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../data/models/WorkerOrderHistoryModel.dart';
+import '../../data/services/worker_history_service.dart';
+import '../pekerja/upload_foto.dart';
 
-class RiwayatScreen extends StatelessWidget {
+class RiwayatScreen extends StatefulWidget {
   const RiwayatScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Contoh data riwayat
-    final List<Map<String, dynamic>> riwayatItems = [
-      {
-        'title': 'AC Service',
-        'date': '20 April 2025, 10.45',
-        'orderDate': '10 April 2025',
-        'status': 'Process'
-      },
-      {
-        'title': 'Cleaning',
-        'date': '20 April 2025, 10.45',
-        'orderDate': '10 April 2025',
-        'status': 'Pending'
-      },
-      {
-        'title': 'tukang kebun',
-        'date': '20 April 2025, 10.45',
-        'orderDate': '10 April 2025',
-        'status': 'Process'
-      },
-      {
-        'title': 'ular dalam parit',
-        'date': '20 April 2025, 10.45',
-        'orderDate': '10 April 2025',
-        'status': 'Done'
-      },
-    ];
+  State<RiwayatScreen> createState() => _RiwayatScreenState();
+}
 
-    // Remove the Scaffold and use a Container as the root widget
+class _RiwayatScreenState extends State<RiwayatScreen> {
+  List<WorkerOrderHistory> _riwayat = [];
+  bool _loading = true;
+  final _service = WorkerHistoryService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRiwayat();
+  }
+
+  Future<void> _loadRiwayat() async {
+    setState(() => _loading = true);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final workerId = prefs.getInt('user_id') ?? 0;
+      if (workerId == 0) throw Exception('User belum login');
+      final data = await _service.getWorkerHistory(workerId);
+      setState(() {
+        _riwayat = data;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() => _loading = false);
+      debugPrint('Error load riwayat: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal memuat riwayat pekerjaan')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
       child: SafeArea(
         child: Column(
           children: [
-            // Custom AppBar (optional, can be removed if using dashboard's AppBar)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Text(
-                    'Riwayat',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
+                    'Pekerjaan Saya',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
                 ],
               ),
             ),
-            // ListView content
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                itemCount: riwayatItems.length,
-                itemBuilder: (context, index) {
-                  final item = riwayatItems[index];
-                  return _buildRiwayatItem(item);
-                },
-              ),
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _riwayat.isEmpty
+                      ? const Center(child: Text('Belum ada pekerjaan yang ditugaskan.'))
+                      : RefreshIndicator(
+                          onRefresh: _loadRiwayat,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                            itemCount: _riwayat.length,
+                            itemBuilder: (context, idx) => _buildRiwayatItem(_riwayat[idx]),
+                          ),
+                        ),
             ),
           ],
         ),
@@ -73,56 +83,40 @@ class RiwayatScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRiwayatItem(Map<String, dynamic> item) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9F9F9),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
+  Widget _buildRiwayatItem(WorkerOrderHistory item) {
+    final serviceName = item.orderDetails.isNotEmpty
+        ? item.orderDetails[0].service.name
+        : 'Layanan';
+
+    return GestureDetector(
+      onTap: item.status == 'proses'
+          ? () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => UploadPhotoScreen(order: item),
+                ),
+              ).then((_) => _loadRiwayat());
+            }
+          : null,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 15),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF9F9F9),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Left section with title and date
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item['title'],
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  Text(
-                    item['date'],
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.black.withOpacity(0.6),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Right section with order date and status
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  item['orderDate'],
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.black.withOpacity(0.6),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                _buildStatusBadge(item['status']),
-              ],
+            Text('Service: $serviceName', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text('Tanggal Pesanan: ${_formatDateTime(item.tanggalPemesanan)}'),
+            Text('Total Pembayaran: Rp${item.totalPembayaran}'),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: _buildStatusBadge(item.status),
             ),
           ],
         ),
@@ -131,37 +125,35 @@ class RiwayatScreen extends StatelessWidget {
   }
 
   Widget _buildStatusBadge(String status) {
-    Color backgroundColor;
-    Color textColor = Colors.black54;
-
+    Color bg;
     switch (status) {
-      case 'Process':
-        backgroundColor = const Color(0xFFB8E8FC); // Light blue
+      case 'proses':
+        bg = const Color(0xFFB8E8FC);
         break;
-      case 'Pending':
-        backgroundColor = const Color(0xFFFFF9C4); // Light yellow
+      case 'pending_setoran':
+        bg = const Color(0xFFFFF9C4);
         break;
-      case 'Done':
-        backgroundColor = const Color(0xFFD5ECC2); // Light green
+      case 'selesai':
+      case 'selesai_pengerjaan':
+        bg = const Color(0xFFD5ECC2);
         break;
       default:
-        backgroundColor = Colors.grey.shade200;
+        bg = Colors.grey.shade200;
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
+      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
       child: Text(
-        status,
-        style: TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-          color: textColor,
-        ),
+        status.replaceAll('_', ' ').toUpperCase(),
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black54),
       ),
     );
+  }
+
+  String _formatDateTime(String ts) {
+    final d = DateTime.parse(ts).toLocal();
+    return '${d.day.toString().padLeft(2, '0')}-${d.month.toString().padLeft(2, '0')}-${d.year}, '
+        '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
   }
 }
