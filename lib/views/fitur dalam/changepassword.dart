@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:home_service/views/auth/login.dart'; 
 import '../../data/services/config.dart';
 import '../auth/login.dart'; // Pastikan Config.baseUrl sudah benar
 
@@ -87,34 +88,38 @@ class _ChangePasswordState extends State<ChangePassword> {
     }
   }
 
-  void _showDialog(String title, String message, bool success) async {
-    final prefs = await SharedPreferences.getInstance();
- // Ambil tipe user
+void _showDialog(String title, String message, bool success) async {
+  final prefs = await SharedPreferences.getInstance();
+  final userType = prefs.getString('user_type');
 
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(title),
-            content: Text(message),
-            actions: [
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // Tutup dialog
-                  if (success) {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
-                      (route) => false,
-                    );
-                  }
-                },
-              ),
-            ],
-          ),
-    );
-  }
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          child: const Text('OK'),
+          onPressed: () async {
+            Navigator.of(context).pop(); // Tutup dialog
+            if (success) {
+              // Hapus token dan arahkan ke login
+              await prefs.remove('token');
+              await prefs.remove('user_type');
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()), // Ganti dengan halaman login Anda
+                (route) => false,
+              );
+            }
+          },
+        ),
+      ],
+    ),
+  );
+}
+
+
 
   @override
   Widget build(BuildContext context) {

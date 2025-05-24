@@ -5,7 +5,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HelpCenterScreen extends StatefulWidget {
-  const HelpCenterScreen({Key? key}) : super(key: key);
+  const HelpCenterScreen({super.key});
 
   @override
   State<HelpCenterScreen> createState() => _HelpCenterScreenState();
@@ -459,8 +459,8 @@ class _QuickHelpButton extends StatelessWidget {
     required this.title,
     required this.color,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -502,8 +502,8 @@ class _FAQItem extends StatelessWidget {
     required this.question,
     required this.answer,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -554,8 +554,8 @@ class _VideoTutorialItem extends StatelessWidget {
     required this.title,
     required this.duration,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -656,8 +656,8 @@ class _SupportChannelItem extends StatelessWidget {
     required this.title,
     required this.info,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

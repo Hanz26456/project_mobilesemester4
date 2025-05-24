@@ -1,7 +1,11 @@
 {
     "version": "0.2.0",
     "configurations": [
+<<<<<<< HEAD
+
+=======
         
+>>>>>>> a47fe7657fbe5ff16067edd20f3bcc6875221bee
         {
             "name": "Flutter Web",
             "request": "launch",

@@ -21,8 +21,10 @@ dependencies:
   dotted_border: ^2.0.0
   iconsax: ^0.0.8
   dio: ^5.4.0
+  gap: ^3.0.1
   flutter_image_compress: ^2.4.0
   path_provider: ^2.1.2
+  url_launcher: ^6.3.1
     
 
   # Ikon bawaan untuk iOS
