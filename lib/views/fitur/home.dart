@@ -61,36 +61,43 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
   }
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: _pages[_selectedIndex],
-    bottomNavigationBar: BottomNavigationBar(
-      selectedItemColor: Colors.teal,
-      unselectedItemColor: Colors.grey,
-      currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
-      type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-        BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Layanan'),
-        BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outlined), label: 'Profil'),
-      ],
-    ),
-    floatingActionButton: FloatingActionButton(
-      tooltip: 'Buka Chatbot',
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ChatScreen()),
-        );
-      },
-      backgroundColor: Colors.teal,
-      child: const Icon(Icons.smart_toy),
-    ),
-  );
-}
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.teal,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Layanan',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outlined),
+            label: 'Profil',
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Buka Chatbot',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ChatScreen()),
+          );
+        },
+        backgroundColor: Colors.teal,
+        child: const Icon(Icons.smart_toy),
+      ),
+    );
+  }
 }
 
 // Halaman beranda dengan data dari API
