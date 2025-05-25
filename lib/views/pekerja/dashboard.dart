@@ -15,7 +15,9 @@ import '../../data/models/job_status.dart';
 import '../../data/services/job_status_service.dart';
 import '../../data/models/worker_statistik.dart';
 import '../../data/services/WorkerStatistikService.dart';
-import 'package:gap/gap.dart';
+import '../../data/services/config.dart';
+import 'dart:io';
+
 
 class Dashboardp extends StatefulWidget {
   const Dashboardp({super.key});
@@ -36,11 +38,13 @@ class _DashboardpState extends State<Dashboardp>
   UserModel? currentUser;
   bool isLoadingUser = false;
   final AuthService _authService = AuthService();
+  File? _imageFile;
 
   final WorkerStatistikService _statistikService = WorkerStatistikService();
   WorkerStatistik? _statistik;
   bool _isLoading = true;
   String? _error;
+  
 
   @override
   void initState() {
@@ -70,6 +74,29 @@ class _DashboardpState extends State<Dashboardp>
       _tabController.animateTo(index); // Sinkronisasi dengan TabController
     });
   }
+  
+  ImageProvider? _getProfileImage() {
+    if (_imageFile != null) {
+      print('Using local image file: ${_imageFile!.path}');
+      return FileImage(_imageFile!);
+    }
+
+    final photo = currentUser?.photo;
+    //rint( 'Photo from UserModel: $photo');
+
+    if (photo != null && photo.isNotEmpty) {
+      final photoUrl =
+          photo.startsWith('http') ? photo : Config.getProfilePhotoUrl(photo);
+
+      return NetworkImage(
+        '$photoUrl?timestamp=${DateTime.now().millisecondsSinceEpoch}',
+      );
+    }
+
+    print('No profile image available, using default');
+    return const AssetImage('assets/default_profile.png'); // Gambar default
+  }
+
 
   Future<void> _loadStatistik() async {
     try {
@@ -237,11 +264,12 @@ class _DashboardpState extends State<Dashboardp>
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.person,
-              color: Color(0xFF3D8361),
-              size: 30,
+            child: CircleAvatar(
+              backgroundImage:_getProfileImage(), // ambil gambar dari fungsi kamu
+              radius: 20, // atau sesuaikan ukuran
+              backgroundColor: Colors.transparent, // opsional
             ),
+
           ),
         ],
       ),
