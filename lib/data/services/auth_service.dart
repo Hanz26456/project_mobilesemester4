@@ -95,6 +95,8 @@ class AuthService {
   final phone = prefs.getString('phone');
   final address = prefs.getString('address');
   final role = prefs.getString('role');
+   final photo = prefs.getString('photo'); 
+  
 
   if (id != null && username != null && email != null && phone != null && address != null && role != null) {
     return UserModel(
@@ -104,6 +106,7 @@ class AuthService {
       phone: phone,
       address: address,
       role: role,
+        photo: photo,
     );
   } else {
     return null;

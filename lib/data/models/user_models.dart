@@ -5,7 +5,7 @@ class UserModel {
   final String phone;
   final String address;
   final String role;
-  final String? photo;
+  String? photo;
 
   UserModel({
     required this.id,
