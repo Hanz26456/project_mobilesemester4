@@ -55,11 +55,18 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setString('email', user.email);
       await prefs.setString('user_data', json.encode(user.toJson()));
       await prefs.setString('role', user.role);
+      await prefs.setString('photo', user.photo ?? '');
 
       if (user.role == 'worker') {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Dashboardp()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Dashboardp()),
+        );
       } else if (user.role == 'customer') {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Role tidak dikenali: ${user.role}')),
@@ -73,16 +80,17 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showLoginErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Login Gagal'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Login Gagal'),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -90,10 +98,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false, // agar wave tetap di bawah saat keyboard muncul
       body: Stack(
         children: [
-          /// Background SVG Wave
+          // Background SVG Wave
           Positioned.fill(
             child: Align(
               alignment: Alignment.bottomCenter,
@@ -139,162 +147,199 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
 
-          /// Main Content
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Center(
-                child: Column(
-                  children: [
-                    const SizedBox(height: 100),
-
-                    // Logo
-                    Image.asset(
-                      'assets/images/logo.png',
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.contain,
+          // Teks Privacy Policy di area wave
+          Positioned(
+            bottom: 100,
+            left: 100,
+            right: 0,
+            child: Center(
+              child: Text(
+                'by logging in , you agree to the\nPrivacy Policy & Terms of Service',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Inter',
+                  fontSize: 11,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                  shadows: [
+                    Shadow(
+                      offset: Offset(0, 1),
+                      blurRadius: 2,
+                      color: Colors.black.withOpacity(0.3),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'HOME SERVICE',
-                      style: AppTextStyles.poppinsHeading,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Please Log in To Continue',
-                      style: AppTextStyles.interRegular.copyWith(fontSize: 13),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Email
-                    CustomTextField(
-                      controller: _emailController,
-                      hint: 'Email',
-                      icon: Image.asset(
-                        'assets/images/Letter.png',
-                        width: 20,
-                        height: 20,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Password
-                    CustomTextField(
-                      controller: _passwordController,
-                      hint: 'Password',
-                      icon: Image.asset(
-                        'assets/images/img_lock.png',
-                        width: 20,
-                        height: 20,
-                      ),
-                      obscureText: _obscureText,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _obscureText ? Icons.visibility_off : Icons.visibility,
-                          color: Colors.grey,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureText = !_obscureText;
-                          });
-                        },
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Remember + Forgot
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: _rememberMe,
-                              activeColor: Colors.green,
-                              onChanged: (value) {
-                                setState(() {
-                                  _rememberMe = value!;
-                                });
-                              },
-                            ),
-                            const Text(
-                              'Remember me',
-                              style: TextStyle(fontFamily: 'Inter', fontSize: 13),
-                            ),
-                          ],
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const ForgotPasswordPage()),
-                            );
-                          },
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              fontSize: 13,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Login Button
-                    SizedBox(
-                      width: 250,
-                      child: PrimaryButton(
-                        label: 'Login',
-                        onPressed: _login,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Sign up
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Don't have an account?", style: TextStyle(fontFamily: 'Inter')),
-                        const SizedBox(width: 4),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const RegisterScreen()),
-                            );
-                          },
-                          child: const Text(
-                            'Sign up',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              color: Colors.lightBlue,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    const Text(
-                      'by logging in , you agree to the\nPrivacy Policy & Terms of Service',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontFamily: 'Inter',
-                        fontSize: 11,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    const SizedBox(height: 180), // biar konten tidak nabrak wave
                   ],
                 ),
               ),
+            ),
+          ),
+
+          // Main Content
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Center(
+                  child: Container(
+                    width: double.infinity,
+                    height: constraints.maxHeight,
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 80),
+
+                        // Logo
+                        Image.asset(
+                          'assets/images/logo.png',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.contain,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'HOME SERVICE',
+                          style: AppTextStyles.poppinsHeading,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Please Log in To Continue',
+                          style: AppTextStyles.interRegular.copyWith(
+                            fontSize: 13,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Email
+                        CustomTextField(
+                          controller: _emailController,
+                          hint: 'Email',
+                          icon: Image.asset(
+                            'assets/images/Letter.png',
+                            width: 20,
+                            height: 20,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Password
+                        CustomTextField(
+                          controller: _passwordController,
+                          hint: 'Password',
+                          icon: Image.asset(
+                            'assets/images/img_lock.png',
+                            width: 20,
+                            height: 20,
+                          ),
+                          obscureText: _obscureText,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.grey,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Remember + Forgot
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: _rememberMe,
+                                  activeColor: Colors.green,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _rememberMe = value!;
+                                    });
+                                  },
+                                ),
+                                const Text(
+                                  'Remember me',
+                                  style: TextStyle(
+                                    fontFamily: 'Inter',
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const ForgotPasswordPage(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                'Forgot Password?',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  fontSize: 13,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // Login Button
+                        SizedBox(
+                          width: 250,
+                          child: PrimaryButton(
+                            label: 'Login',
+                            onPressed: _login,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Sign up
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Don't have an account?",
+                              style: TextStyle(fontFamily: 'Inter'),
+                            ),
+                            const SizedBox(width: 4),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder:
+                                        (context) => const RegisterScreen(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                'Sign up',
+                                style: TextStyle(
+                                  fontFamily: 'Inter',
+                                  color: Colors.lightBlue,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const Spacer(), // Jaga agar ada ruang untuk wave
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],
