@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../pekerja/jobdetail.dart';
 import 'riwayat.dart';
@@ -104,11 +105,14 @@ class _DashboardpState extends State<Dashboardp>
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final user = await Sessionn.user();
+    // final prefs = await SharedPreferences.getInstance();
+    final token = user['token'];
 
       // Pendekatan 1: Coba ambil langsung username dari SharedPreferences
-      if (prefs.containsKey('username')) {
-        String savedUsername = prefs.getString('username') ?? 'Pengguna';
+      if (user['username'] != null &&
+          user['username'].toString().isNotEmpty) {
+        String savedUsername = user['username'] ?? 'Pengguna';
         print(
           'Username ditemukan langsung di SharedPreferences: $savedUsername',
         );
@@ -118,17 +122,15 @@ class _DashboardpState extends State<Dashboardp>
       }
 
       // Pendekatan 2: Ambil dari user_data
-      final userJson = prefs.getString('user_data');
-      if (userJson != null) {
-        final userMap = json.decode(userJson);
-        final extractedUsername = userMap['username'];
-        print('Username dari user_data: $extractedUsername');
+      final usernamed = user['username']
+      if (usernamed != null) {
+      
 
-        if (extractedUsername != null &&
-            extractedUsername.toString().isNotEmpty) {
+        if (usernamed != null &&
+            usernamed.toString().isNotEmpty) {
           setState(() {
-            username = extractedUsername;
-            currentUser = UserModel.fromJson(userMap);
+            username = usernamed;
+            // currentUser = UserModel.fromJson(userMap);
           });
           print('Username diset ke: $username');
         }
@@ -247,14 +249,14 @@ class _DashboardpState extends State<Dashboardp>
   }
 
   Widget _buatDashboardContent() {
-    print('''
-Build Dashboard Content:
-- isLoadingUser: $isLoadingUser
-- _isLoading: $_isLoading
-- _error: $_error
-- _statistik: ${_statistik?.toString()}
-- currentUser: ${currentUser?.toString()}
-''');
+//     print('''
+// Build Dashboard Content:
+// - isLoadingUser: $isLoadingUser
+// - _isLoading: $_isLoading
+// - _error: $_error
+// - _statistik: ${_statistik?.toString()}
+// - currentUser: ${currentUser?.toString()}
+// ''');
     // Tampilkan loading indicator secara jelas di tengah layar
     if (isLoadingUser || _isLoading) {
       return Center(

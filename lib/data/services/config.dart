@@ -5,4 +5,4 @@ class Config {
  static String getProfilePhotoUrl(String filename) {
     return '$fileBaseUrl$filename';
 }
-}
+} 

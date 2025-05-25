@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:home_service/data/services/session.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../fitur/service.dart';
@@ -61,36 +62,43 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
   }
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: _pages[_selectedIndex],
-    bottomNavigationBar: BottomNavigationBar(
-      selectedItemColor: Colors.teal,
-      unselectedItemColor: Colors.grey,
-      currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
-      type: BottomNavigationBarType.fixed,
-      items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
-        BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Layanan'),
-        BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
-        BottomNavigationBarItem(icon: Icon(Icons.person_outlined), label: 'Profil'),
-      ],
-    ),
-    floatingActionButton: FloatingActionButton(
-      tooltip: 'Buka Chatbot',
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ChatScreen()),
-        );
-      },
-      backgroundColor: Colors.teal,
-      child: const Icon(Icons.smart_toy),
-    ),
-  );
-}
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.teal,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Beranda'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Layanan',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Riwayat'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outlined),
+            label: 'Profil',
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Buka Chatbot',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ChatScreen()),
+          );
+        },
+        backgroundColor: Colors.teal,
+        child: const Icon(Icons.smart_toy),
+      ),
+    );
+  }
 }
 
 // Halaman beranda dengan data dari API
@@ -122,13 +130,15 @@ class _HomePageState extends State<HomePage> {
     setState(() => isLoadingUser = true);
     try {
       // Ambil data user dari SharedPreferences yang disimpan saat login
-      final prefs = await SharedPreferences.getInstance();
-      String? userJson = prefs.getString('user_data');
-
-      if (userJson != null) {
-        Map<String, dynamic> userData = json.decode(userJson);
+      // final prefs = await SharedPreferences.getInstance();
+      // String? userJson = prefs.getString('user_data');
+      final user = await Sessionn.user();
+      // final prefs = await SharedPreferences.getInstance();
+      // final username = user['username'];
+      if (user['username'] != null) {
+        // Map<String, dynamic> userData = json.decode(userJson);
         setState(() {
-          currentUser = UserModel.fromJson(userData);
+          currentUser = user['username'];
         });
       }
     } catch (e) {
@@ -182,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                           )
                           : Text(
                             currentUser != null
-                                ? 'Halo, ${currentUser!.username}'
+                                ? 'Halo, ${currentUser}'
                                 : 'Memuat data pengguna...',
                             style: const TextStyle(
                               fontSize: 24,

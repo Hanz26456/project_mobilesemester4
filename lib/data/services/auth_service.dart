@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:home_service/data/services/database.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,17 +53,28 @@ class AuthService {
       if (response.statusCode == 200) {
         final token = data['token'];
         final user = UserModel.fromJson(data['user']);
+        UserModel dataa = UserModel(
+          id: 1,
+          username: user.username,
+          email: user.email,
+          phone: user.phone,
+          address: user.address,
+          role:  user.role,
+          photo: user.photo,
+          token: token,
+        );
 
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
+        await DatabaseHelper().insertUser(dataa);
+        // final prefs = await SharedPreferences.getInstance();
+        // await prefs.setString('token', token);
 
-        // ✅ Simpan data user ke SharedPreferences
-        await prefs.setInt('id', user.id);
-        await prefs.setString('username', user.username);
-        await prefs.setString('email', user.email);
-        await prefs.setString('phone', user.phone);
-        await prefs.setString('address', user.address);
-        await prefs.setString('role', user.role);
+        // // ✅ Simpan data user ke SharedPreferences
+        // await prefs.setInt('id', user.id);
+        // await prefs.setString('username', user.username);
+        // await prefs.setString('email', user.email);
+        // await prefs.setString('phone', user.phone);
+        // await prefs.setString('address', user.address);
+        // await prefs.setString('role', user.role);
 
         return user;
       } else {
@@ -87,32 +99,35 @@ class AuthService {
   }
 
   Future<UserModel?> getUserFromPrefs() async {
-  final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
 
-  final id = prefs.getInt('id');
-  final username = prefs.getString('username');
-  final email = prefs.getString('email');
-  final phone = prefs.getString('phone');
-  final address = prefs.getString('address');
-  final role = prefs.getString('role');
-   final photo = prefs.getString('photo'); 
-  
+    final id = prefs.getInt('id');
+    final username = prefs.getString('username');
+    final email = prefs.getString('email');
+    final phone = prefs.getString('phone');
+    final address = prefs.getString('address');
+    final role = prefs.getString('role');
+    final photo = prefs.getString('photo');
 
-  if (id != null && username != null && email != null && phone != null && address != null && role != null) {
-    return UserModel(
-      id: id,
-      username: username,
-      email: email,
-      phone: phone,
-      address: address,
-      role: role,
+    if (id != null &&
+        username != null &&
+        email != null &&
+        phone != null &&
+        address != null &&
+        role != null) {
+      return UserModel(
+        id: id,
+        username: username,
+        email: email,
+        phone: phone,
+        address: address,
+        role: role,
         photo: photo,
-    );
-  } else {
-    return null;
+      );
+    } else {
+      return null;
+    }
   }
-}
-
 
   // edit profil
   Future<UserModel?> getUserProfile() async {
