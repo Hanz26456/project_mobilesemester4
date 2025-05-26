@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:home_service/data/services/session.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../pekerja/jobdetail.dart';
 import 'riwayat.dart';
@@ -37,11 +38,13 @@ class _DashboardpState extends State<Dashboardp>
   bool isLoadingUser = false;
   final AuthService _authService = AuthService();
   File? _imageFile;
+  File? _imageFile;
 
   final WorkerStatistikService _statistikService = WorkerStatistikService();
   WorkerStatistik? _statistik;
   bool _isLoading = true;
   String? _error;
+  
 
   @override
   void initState() {
@@ -269,6 +272,7 @@ class _DashboardpState extends State<Dashboardp>
               radius: 20, // atau sesuaikan ukuran
               backgroundColor: Colors.transparent, // opsional
             ),
+
           ),
         ],
       ),
@@ -415,7 +419,6 @@ class _DashboardpState extends State<Dashboardp>
       },
     );
   }
-
   Widget _buildStatusCard(
     String count,
     String label,
