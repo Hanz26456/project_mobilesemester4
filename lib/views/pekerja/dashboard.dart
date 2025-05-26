@@ -38,7 +38,7 @@ class _DashboardpState extends State<Dashboardp>
   bool isLoadingUser = false;
   final AuthService _authService = AuthService();
   File? _imageFile;
-  File? _imageFile;
+
 
   final WorkerStatistikService _statistikService = WorkerStatistikService();
   WorkerStatistik? _statistik;
