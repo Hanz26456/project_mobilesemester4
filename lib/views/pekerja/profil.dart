@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:home_service/data/services/database.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:home_service/data/services/upload_profile_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
@@ -18,7 +20,7 @@ class ProfilePekerja extends StatefulWidget {
 }
 
 class _ProfilePekerjaState extends State<ProfilePekerja> {
-  UserModel? currentUser;
+  Map<String, dynamic>? currentUser;
   bool isLoading = true;
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
@@ -36,11 +38,13 @@ class _ProfilePekerjaState extends State<ProfilePekerja> {
   }
 
   Future<void> _loadUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userJson = prefs.getString('user_data');
+    // final prefs = await SharedPreferences.getInstance();
+    final user = await Sessionn.user();
+    // final prefs = await SharedPreferences.getInstance();
+    final userJson = user;
     if (userJson != null) {
       setState(() {
-        currentUser = UserModel.fromJson(json.decode(userJson));
+        currentUser = user;
         isLoading = false;
       });
     } else {
@@ -51,8 +55,10 @@ class _ProfilePekerjaState extends State<ProfilePekerja> {
   }
 
   Future<void> _checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('user_data')) {
+    // final prefs = await SharedPreferences.getInstance();
+    final user = await Sessionn.user();
+    // final prefs = await SharedPreferences.getInstance();
+    if (!user["username"] == "") {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -136,6 +142,7 @@ class _ProfilePekerjaState extends State<ProfilePekerja> {
       if (pickedFile != null) {
         setState(() {
           _imageFile = File(pickedFile.path);
+          // print(_imageFile);
         });
         await _uploadProfilePhoto();
       }
@@ -144,16 +151,19 @@ class _ProfilePekerjaState extends State<ProfilePekerja> {
     }
   }
 
-   Future<void> _uploadProfilePhoto() async {
+  Future<void> _uploadProfilePhoto() async {
     if (_imageFile == null || currentUser == null) return;
 
     try {
       _showLoadingDialog();
 
-      final prefs = await SharedPreferences.getInstance();
-      var token = prefs.getString('token');
-      var userId = currentUser!.id;
-
+      // final prefs = await SharedPreferences.getInstance();
+      // var token = prefs.getString('token');
+      final user = await Sessionn.user();
+      // final prefs = await SharedPreferences.getInstance();
+      final token = user['token'];
+      var userId = currentUser?["user_id"];
+      // print(_imageFile);
       final response = await UploadProfileService.uploadProfilePhoto(
         _imageFile,
         token,
@@ -167,12 +177,21 @@ class _ProfilePekerjaState extends State<ProfilePekerja> {
         var jsonResponse = json.decode(response.body);
         if (jsonResponse['success'] == true) {
           setState(() {
-            currentUser!.photo = jsonResponse['photo_url'];
+            currentUser!["photo"] = jsonResponse['photo_url'];
             _imageFile = null; // Reset _imageFile setelah upload
           });
-          await prefs.setString(
-            'user_data',
-            json.encode(currentUser!.toJson()),
+          final dbHelper = DatabaseHelper();
+          await dbHelper.updateUser(
+            UserModel(
+              id: currentUser?["user_id"],
+              username: currentUser?["username"],
+              email: currentUser?["email"],
+              address: currentUser?["address"],
+              role: currentUser?["role"],
+              photo: jsonResponse['photo_url'],
+              token: currentUser?["token"],
+              phone: currentUser?["phone"] ?? '',
+            ),
           );
           _showSuccessSnackBar('Foto profil berhasil diperbarui!');
         } else {
@@ -194,7 +213,7 @@ class _ProfilePekerjaState extends State<ProfilePekerja> {
       return FileImage(_imageFile!);
     }
 
-    final photo = currentUser?.photo;
+    final photo = currentUser?["photo"];
     //rint( 'Photo from UserModel: $photo');
 
     if (photo != null && photo.isNotEmpty) {
@@ -409,7 +428,7 @@ class _ProfilePekerjaState extends State<ProfilePekerja> {
                               children: [
                                 // Username
                                 Text(
-                                  currentUser!.username,
+                                  currentUser!["username"],
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -430,7 +449,7 @@ class _ProfilePekerjaState extends State<ProfilePekerja> {
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      currentUser!.email,
+                                      currentUser!["email"],
                                       style: TextStyle(
                                         fontSize: 15,
                                         color: Colors.grey.shade700,
@@ -594,9 +613,10 @@ class _ProfilePekerjaState extends State<ProfilePekerja> {
                                         ),
                                         ElevatedButton(
                                           onPressed: () async {
-                                            final prefs =
-                                                await SharedPreferences.getInstance();
-                                            await prefs.remove('user_data');
+                                            // final prefs =
+                                            //     await SharedPreferences.getInstance();
+                                            // await prefs.remove('user_data');
+                                            await DatabaseHelper().deleteUser();
                                             Navigator.of(context).pop();
                                             Navigator.pushReplacement(
                                               context,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/primary_button.dart';
 import '../../data/models/order_request.dart';
@@ -81,8 +82,10 @@ class _ServiceOrderSummaryState extends State<ServiceOrderSummary> {
       return;
     }
 
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getInt('user_id');
+    // final prefs = await SharedPreferences.getInstance();
+    final user = await Sessionn.user();
+    // final prefs = await SharedPreferences.getInstance();
+    final userId = user['user_id'];
 
     if (userId == null) {
       ScaffoldMessenger.of(context).showSnackBar(

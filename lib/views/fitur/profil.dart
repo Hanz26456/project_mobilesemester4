@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:home_service/data/services/database.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:home_service/data/services/upload_profile_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,7 +23,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  UserModel? currentUser;
+  Map<String, dynamic>? currentUser;
   bool isLoading = true;
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
@@ -39,8 +41,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('user_data')) {
+    final user = await Sessionn.user();
+
+    if (user['user_id'] == null || user['user_id'].toString().isEmpty) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -51,12 +54,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadUserData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userJson = prefs.getString('user_data');
+    final user = await Sessionn.user();
+    // final userJson = prefs.getString('user_data');
     // print('User data from SharedPreferences: $userJson');
-    if (userJson != null) {
+    if (user != null) {
       setState(() {
-        currentUser = UserModel.fromJson(json.decode(userJson));
+        currentUser = user;
         isLoading = false;
         // print('Photo URL: ${currentUser?.photo}');
       });
@@ -153,14 +156,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Fungsi untuk upload foto ke server
   Future<void> _uploadProfilePhoto() async {
+    print("Image File: ${_imageFile}");
     if (_imageFile == null || currentUser == null) return;
 
     try {
       _showLoadingDialog();
 
-      final prefs = await SharedPreferences.getInstance();
-      var token = prefs.getString('token');
-      var userId = currentUser!.id;
+      // final prefs = await SharedPreferences.getInstance();
+      var token = currentUser?["token"];
+      var userId = currentUser?["user_id"];
+      print("Image File: ${_imageFile}");
 
       final response = await UploadProfileService.uploadProfilePhoto(
         _imageFile,
@@ -169,19 +174,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
 
       Navigator.pop(context); // Tutup dialog loading
-      // print('Upload response: $response');
+      print(response.body);
 
       if (response != null && response.statusCode == 200) {
         var jsonResponse = json.decode(response.body);
         if (jsonResponse['success'] == true) {
           setState(() {
-            currentUser!.photo = jsonResponse['photo_url'];
+            currentUser?["photo"] = jsonResponse['photo_url'];
             _imageFile = null; // Reset _imageFile setelah upload
           });
-          await prefs.setString(
-            'user_data',
-            json.encode(currentUser!.toJson()),
+          final dbHelper = DatabaseHelper();
+          await dbHelper.updateUser(
+            UserModel(
+              id: currentUser?["user_id"],
+              username: currentUser?["username"],
+              email: currentUser?["email"],
+              address: currentUser?["address"],
+              role: currentUser?["role"],
+              photo: jsonResponse['photo_url'],
+              token: currentUser?["token"],
+              phone: currentUser?["phone"] ?? '',
+            ),
           );
+          // await prefs.setString(
+          //   'user_data',
+          //   json.encode(currentUser!.toJson()),
+          // );
           _showSuccessSnackBar('Foto profil berhasil diperbarui!');
         } else {
           _showErrorSnackBar(jsonResponse['message'] ?? 'Upload gagal');
@@ -202,7 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return FileImage(_imageFile!);
     }
 
-    final photo = currentUser?.photo;
+    final photo = currentUser?["photo"];
     //rint( 'Photo from UserModel: $photo');
 
     if (photo != null && photo.isNotEmpty) {
@@ -411,7 +429,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Column(
                               children: [
                                 Text(
-                                  currentUser!.username,
+                                  currentUser!["username"],
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -429,7 +447,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      currentUser!.email,
+                                      currentUser!["email"],
                                       style: TextStyle(
                                         fontSize: 15,
                                         color: Colors.grey.shade700,
@@ -610,10 +628,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ),
                                         ElevatedButton(
                                           onPressed: () async {
-                                            final prefs =
-                                                await SharedPreferences.getInstance();
-                                            await prefs.remove('user_data');
-                                            await prefs.remove('token');
+                                            // final prefs =
+                                            //     await SharedPreferences.getInstance();
+                                            // await prefs.remove('user_data');
+                                            // await prefs.remove('token');
+                                            await DatabaseHelper().deleteUser();
                                             setState(() {
                                               _imageFile =
                                                   null; // Reset image file

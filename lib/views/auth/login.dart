@@ -49,13 +49,13 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (user != null) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('user_id', user.id);
-      await prefs.setString('user_address', user.address);
-      await prefs.setString('email', user.email);
-      await prefs.setString('user_data', json.encode(user.toJson()));
-      await prefs.setString('role', user.role);
-      await prefs.setString('photo', user.photo ?? '');
+      // final prefs = await SharedPreferences.getInstance();
+      // await prefs.setInt('user_id', user.id);
+      // await prefs.setString('user_address', user.address);
+      // await prefs.setString('email', user.email);
+      // await prefs.setString('user_data', json.encode(user.toJson()));
+      // await prefs.setString('role', user.role);
+      // await prefs.setString('photo', user.photo ?? '');
 
       if (user.role == 'worker') {
         Navigator.pushReplacement(

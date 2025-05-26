@@ -13,6 +13,7 @@ class UploadProfileService {
       print("❗ Data tidak lengkap. Upload dibatalkan.");
       return null;
     }
+    // print(imageFile);
 
     final uri = Uri.parse('${Config.baseUrl}/upload-profile-photo');
     final request = http.MultipartRequest('POST', uri);
@@ -21,11 +22,13 @@ class UploadProfileService {
     request.headers['Accept'] = 'application/json';
     request.fields['user_id'] = userId;
 
-    request.files.add(await http.MultipartFile.fromPath(
-      'photo',
-      imageFile.path,
-      filename: basename(imageFile.path),
-    ));
+    request.files.add(
+      await http.MultipartFile.fromPath(
+        'photo',
+        imageFile.path,
+        filename: basename(imageFile.path),
+      ),
+    );
 
     try {
       final streamedResponse = await request.send();
@@ -35,6 +38,7 @@ class UploadProfileService {
         streamedResponse.statusCode,
         headers: streamedResponse.headers,
       );
+      print(fullResponse.body);
 
       return fullResponse;
     } catch (e) {

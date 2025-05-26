@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:home_service/data/services/session.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/worker_statistik.dart';
@@ -7,8 +8,9 @@ import '../services/config.dart';
 class WorkerStatistikService {
   Future<WorkerStatistik> fetchStatistik() async {
     print('=== Fetching statistik ===');
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final user = await Sessionn.user();
+    // final prefs = await SharedPreferences.getInstance();
+    final token = user['token'];
     print('Token: ${token != null ? 'Ada' : 'Tidak ada'}');
 
     if (token == null) {

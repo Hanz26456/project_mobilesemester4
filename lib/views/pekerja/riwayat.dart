@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/models/WorkerOrderHistoryModel.dart';
 import '../../data/services/worker_history_service.dart';
@@ -25,8 +26,11 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   Future<void> _loadRiwayat() async {
     setState(() => _loading = true);
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final workerId = prefs.getInt('user_id') ?? 0;
+      // final prefs = await SharedPreferences.getInstance();
+      final user = await Sessionn.user();
+      // final prefs = await SharedPreferences.getInstance();
+      // final token = user['token'];
+      final workerId = user['user_id'] ?? 0;
       if (workerId == 0) throw Exception('User belum login');
       final data = await _service.getWorkerHistory(workerId);
       setState(() {
@@ -42,13 +46,17 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     }
   }
 
-  List<WorkerOrderHistory> get _tabKiriRiwayat => _riwayat
-      .where((e) => e.status == 'proses' || e.status == 'selesai_pengerjaan')
-      .toList();
+  List<WorkerOrderHistory> get _tabKiriRiwayat =>
+      _riwayat
+          .where(
+            (e) => e.status == 'proses' || e.status == 'selesai_pengerjaan',
+          )
+          .toList();
 
-  List<WorkerOrderHistory> get _tabKananRiwayat => _riwayat
-      .where((e) => e.status == 'pending_setoran' || e.status == 'selesai')
-      .toList();
+  List<WorkerOrderHistory> get _tabKananRiwayat =>
+      _riwayat
+          .where((e) => e.status == 'pending_setoran' || e.status == 'selesai')
+          .toList();
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +72,11 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                 child: Center(
                   child: Text(
                     'Pekerjaan Saya',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ),
@@ -78,14 +90,15 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                 ],
               ),
               Expanded(
-                child: _loading
-                    ? const Center(child: CircularProgressIndicator())
-                    : TabBarView(
-                        children: [
-                          _buildRiwayatList(_tabKiriRiwayat),
-                          _buildRiwayatList(_tabKananRiwayat),
-                        ],
-                      ),
+                child:
+                    _loading
+                        ? const Center(child: CircularProgressIndicator())
+                        : TabBarView(
+                          children: [
+                            _buildRiwayatList(_tabKiriRiwayat),
+                            _buildRiwayatList(_tabKananRiwayat),
+                          ],
+                        ),
               ),
             ],
           ),
@@ -110,21 +123,23 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   }
 
   Widget _buildRiwayatItem(WorkerOrderHistory item) {
-    final serviceName = item.orderDetails.isNotEmpty
-        ? item.orderDetails[0].service.name
-        : 'Layanan';
+    final serviceName =
+        item.orderDetails.isNotEmpty
+            ? item.orderDetails[0].service.name
+            : 'Layanan';
 
     return GestureDetector(
-      onTap: item.status == 'proses'
-          ? () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => UploadPhotoScreen(order: item),
-                ),
-              ).then((_) => _loadRiwayat());
-            }
-          : null,
+      onTap:
+          item.status == 'proses'
+              ? () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => UploadPhotoScreen(order: item),
+                  ),
+                ).then((_) => _loadRiwayat());
+              }
+              : null,
       child: Container(
         margin: const EdgeInsets.only(bottom: 15),
         padding: const EdgeInsets.all(16),
@@ -135,8 +150,10 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Service: $serviceName',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(
+              'Service: $serviceName',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 4),
             Text('Tanggal Pesanan: ${_formatDateTime(item.tanggalPemesanan)}'),
             Text('Total Pembayaran: Rp${item.totalPembayaran}'),
@@ -170,10 +187,17 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(20)),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Text(
         status.replaceAll('_', ' ').toUpperCase(),
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black54),
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: Colors.black54,
+        ),
       ),
     );
   }

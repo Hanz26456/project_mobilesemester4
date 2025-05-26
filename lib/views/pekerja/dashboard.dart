@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../pekerja/jobdetail.dart';
 import 'riwayat.dart';
@@ -14,14 +15,14 @@ import '../../data/models/job_status.dart';
 import '../../data/services/job_status_service.dart';
 import '../../data/models/worker_statistik.dart';
 import '../../data/services/WorkerStatistikService.dart';
-import 'package:gap/gap.dart';
+import '../../data/services/config.dart';
+import 'dart:io';
 
 class Dashboardp extends StatefulWidget {
   const Dashboardp({super.key});
 
   @override
   State<Dashboardp> createState() => _DashboardpState();
-  
 }
 
 class _DashboardpState extends State<Dashboardp>
@@ -32,9 +33,10 @@ class _DashboardpState extends State<Dashboardp>
 
   // User dan statistik
   String username = 'Pengguna';
-  UserModel? currentUser;
+  Map<String, dynamic>? currentUser;
   bool isLoadingUser = false;
   final AuthService _authService = AuthService();
+  File? _imageFile;
 
   final WorkerStatistikService _statistikService = WorkerStatistikService();
   WorkerStatistik? _statistik;
@@ -68,6 +70,29 @@ class _DashboardpState extends State<Dashboardp>
       _selectedIndex = index;
       _tabController.animateTo(index); // Sinkronisasi dengan TabController
     });
+  }
+
+  ImageProvider? _getProfileImage() {
+    if (_imageFile != null) {
+      print('Using local image file: ${_imageFile!.path}');
+      return FileImage(_imageFile!);
+    }
+
+    final photo = currentUser!["photo"];
+    print('Photo from UserModel: $photo');
+    //rint( 'Photo from UserModel: $photo');
+
+    if (photo != null && photo.isNotEmpty) {
+      final photoUrl =
+          photo.startsWith('http') ? photo : Config.getProfilePhotoUrl(photo);
+
+      return NetworkImage(
+        '$photoUrl?timestamp=${DateTime.now().millisecondsSinceEpoch}',
+      );
+    }
+
+    print('No profile image available, using default');
+    return const AssetImage('assets/default_profile.png'); // Gambar default
   }
 
   Future<void> _loadStatistik() async {
@@ -104,11 +129,13 @@ class _DashboardpState extends State<Dashboardp>
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
+      final user = await Sessionn.user();
+      // final prefs = await SharedPreferences.getInstance();
+      // final token = user['token'];
 
       // Pendekatan 1: Coba ambil langsung username dari SharedPreferences
-      if (prefs.containsKey('username')) {
-        String savedUsername = prefs.getString('username') ?? 'Pengguna';
+      if (user['username'] != null && user['username'].toString().isNotEmpty) {
+        String savedUsername = user['username'] ?? 'Pengguna';
         print(
           'Username ditemukan langsung di SharedPreferences: $savedUsername',
         );
@@ -118,17 +145,12 @@ class _DashboardpState extends State<Dashboardp>
       }
 
       // Pendekatan 2: Ambil dari user_data
-      final userJson = prefs.getString('user_data');
-      if (userJson != null) {
-        final userMap = json.decode(userJson);
-        final extractedUsername = userMap['username'];
-        print('Username dari user_data: $extractedUsername');
-
-        if (extractedUsername != null &&
-            extractedUsername.toString().isNotEmpty) {
+      final usernamed = user['username'];
+      if (usernamed != null) {
+        if (usernamed != null && usernamed.toString().isNotEmpty) {
           setState(() {
-            username = extractedUsername;
-            currentUser = UserModel.fromJson(userMap);
+            username = usernamed;
+            currentUser = user;
           });
           print('Username diset ke: $username');
         }
@@ -150,8 +172,12 @@ class _DashboardpState extends State<Dashboardp>
   Future<JobStatus> getJobStatus() async {
     try {
       // Dapatkan token dari shared preferences
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
+      // final prefs = await SharedPreferences.getInstance()
+      // ;
+      final user = await Sessionn.user();
+      // final prefs = await SharedPreferences.getInstance();
+      final token = user['token'];
+      // final token = prefs.getString('token') ?? '';
 
       // Jika token kosong, kembalikan nilai default
       if (token.isEmpty) {
@@ -171,27 +197,29 @@ class _DashboardpState extends State<Dashboardp>
 
   Future<String> getToken() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
+      // final prefs = await SharedPreferences.getInstance();
+      final user = await Sessionn.user();
+      // final prefs = await SharedPreferences.getInstance();
 
       // Periksa beberapa kemungkinan key untuk token
-      String? token = prefs.getString('auth_token');
-      if (token == null || token.isEmpty) {
-        token = prefs.getString('token');
-      }
-      if (token == null || token.isEmpty) {
-        token = prefs.getString('access_token');
-      }
+      String token = user['token'];
+      // if (token == null || token.isEmpty) {
+      //   token = prefs.getString('token');
+      // }
+      // if (token == null || token.isEmpty) {
+      //   token = prefs.getString('access_token');
+      // }
 
       print(
         'Retrieved token: ${token != null && token.isNotEmpty ? "${token.substring(0, min(10, token.length))}..." : "EMPTY"}',
       );
 
       // Check key-key yang ada di SharedPreferences untuk debugging
-      print('All SharedPreferences keys:');
-      Set<String> keys = prefs.getKeys();
-      for (String key in keys) {
-        print('- $key');
-      }
+      // print('All SharedPreferences keys:');
+      // Set<String> keys = prefs.getKeys();
+      // for (String key in keys) {
+      //   print('- $key');
+      // }
 
       return token ?? '';
     } catch (e) {
@@ -235,10 +263,11 @@ class _DashboardpState extends State<Dashboardp>
               color: Colors.white,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.person,
-              color: Color(0xFF3D8361),
-              size: 30,
+            child: CircleAvatar(
+              backgroundImage:
+                  _getProfileImage(), // ambil gambar dari fungsi kamu
+              radius: 20, // atau sesuaikan ukuran
+              backgroundColor: Colors.transparent, // opsional
             ),
           ),
         ],
@@ -247,21 +276,17 @@ class _DashboardpState extends State<Dashboardp>
   }
 
   Widget _buatDashboardContent() {
-    print('''
-Build Dashboard Content:
-- isLoadingUser: $isLoadingUser
-- _isLoading: $_isLoading
-- _error: $_error
-- _statistik: ${_statistik?.toString()}
-- currentUser: ${currentUser?.toString()}
-''');
+    //     print('''
+    // Build Dashboard Content:
+    // - isLoadingUser: $isLoadingUser
+    // - _isLoading: $_isLoading
+    // - _error: $_error
+    // - _statistik: ${_statistik?.toString()}
+    // - currentUser: ${currentUser?.toString()}
+    // ''');
     // Tampilkan loading indicator secara jelas di tengah layar
     if (isLoadingUser || _isLoading) {
-      return Center(
-        child: CircularProgressIndicator(
-          color: Color(0xFF3D8361),
-        ),
-      );
+      return Center(child: CircularProgressIndicator(color: Color(0xFF3D8361)));
     }
 
     // Tampilkan error message secara jelas
@@ -295,7 +320,7 @@ Build Dashboard Content:
             ),
           ),
         ),
-        
+
         // Konten utama
         SingleChildScrollView(
           child: Column(
@@ -305,10 +330,7 @@ Build Dashboard Content:
               const SizedBox(height: 20),
               _buildPerformanceWidget(),
               _buildStatusSummary(),
-              _buildSectionHeader(
-                "Pekerjaan Hari Ini",
-                "Lihat Semua",
-              ),
+              _buildSectionHeader("Pekerjaan Hari Ini", "Lihat Semua"),
               _buildJobsList(),
               const SizedBox(height: 20),
             ],
@@ -501,22 +523,22 @@ Build Dashboard Content:
   }
 
   Widget _buildJobCard(OrderPekerja order) {
-
     return GestureDetector(
       onTap: () {
-       Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => JobDetailScreen(
-      userName: order.namaUser,
-      userAddress: order.alamat,
-      serviceName: order.service,
-      status: order.status,
-      tanggal: order.tanggalPemesanan,
-      phone: order.phone, // harusnya ini berisi '085388393834'
-    ),
-  ),
-);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) => JobDetailScreen(
+                  userName: order.namaUser,
+                  userAddress: order.alamat,
+                  serviceName: order.service,
+                  status: order.status,
+                  tanggal: order.tanggalPemesanan,
+                  phone: order.phone, // harusnya ini berisi '085388393834'
+                ),
+          ),
+        );
       },
       child: Container(
         width: 160,

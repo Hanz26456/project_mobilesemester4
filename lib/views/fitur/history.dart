@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../data/services/history_service.dart';
 import '../../data/models/order_response.dart';
@@ -22,8 +23,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void loadUserAndFetch() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedUserId = prefs.getInt('user_id');
+    final user = await Sessionn.user();
+    // final prefs = await SharedPreferences.getInstance();
+    final token = user['token'];
+    final savedUserId = user['user_id'];
     print('✅ user_id dari SharedPreferences: $savedUserId');
 
     if (savedUserId != null) {

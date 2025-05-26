@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:home_service/data/services/session.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../fitur/service.dart';
@@ -113,7 +114,7 @@ class _HomePageState extends State<HomePage> {
   bool isLoadingPopular = false;
 
   // Tambahkan untuk user
-  UserModel? currentUser;
+  String currentUser="";
   bool isLoadingUser = false;
   final AuthService _authService = AuthService(); // Instansiasi AuthService
 
@@ -129,13 +130,15 @@ class _HomePageState extends State<HomePage> {
     setState(() => isLoadingUser = true);
     try {
       // Ambil data user dari SharedPreferences yang disimpan saat login
-      final prefs = await SharedPreferences.getInstance();
-      String? userJson = prefs.getString('user_data');
-
-      if (userJson != null) {
-        Map<String, dynamic> userData = json.decode(userJson);
+      // final prefs = await SharedPreferences.getInstance();
+      // String? userJson = prefs.getString('user_data');
+      final user = await Sessionn.user();
+      // final prefs = await SharedPreferences.getInstance();
+      // final username = user['username'];
+      if (user['username'] != null) {
+        // Map<String, dynamic> userData = json.decode(userJson);
         setState(() {
-          currentUser = UserModel.fromJson(userData);
+          currentUser = user['username'];
         });
       }
     } catch (e) {
@@ -189,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                           )
                           : Text(
                             currentUser != null
-                                ? 'Halo, ${currentUser!.username}'
+                                ? 'Halo, ${currentUser}'
                                 : 'Memuat data pengguna...',
                             style: const TextStyle(
                               fontSize: 24,

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -49,8 +50,9 @@ class WorkPhotoService {
     String? catatan,
   }) async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? '';
+    final user = await Sessionn.user();
+    // final prefs = await SharedPreferences.getInstance();
+    final token = user['token'];
       
       if (token.isEmpty) {
         throw Exception('Token tidak ditemukan, silakan login kembali');

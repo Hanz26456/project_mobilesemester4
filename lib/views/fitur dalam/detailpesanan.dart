@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:printing/printing.dart';         // untuk Printing.layoutPdf
 import 'package:pdf/pdf.dart';                   // untuk PdfPageFormat
@@ -25,8 +26,11 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   }
 
   void _loadUserAddress() async {
-    final prefs = await SharedPreferences.getInstance();
-    final alamat = prefs.getString('user_address');
+    // final prefs = await SharedPreferences.getInstance();
+    final user = await Sessionn.user();
+    // final prefs = await SharedPreferences.getInstance();
+    final alamat = user['address'];
+    // final alamat = prefs.getString('user_address');
     setState(() {
       userAddress = alamat ?? 'Alamat tidak tersedia';
     });

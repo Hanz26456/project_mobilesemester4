@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:home_service/data/services/database.dart';
+import 'package:home_service/data/services/session.dart';
+import 'package:sqflite/sqlite_api.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/primary_button.dart';
 import '../../data/services/auth_service.dart';
@@ -21,7 +24,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
-  UserModel? _currentUser;
+  Map<String, dynamic>? _currentUser;
   bool _isLoading = true;
   bool _loadError = false;
   String _errorMessage = '';
@@ -51,15 +54,16 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     });
 
     try {
-      final user = await AuthService().getUserFromPrefs();
+      // final user = await AuthService().getUserFromPrefs();
+      final user = await Sessionn.user();
 
       if (user != null) {
         setState(() {
           _currentUser = user;
-          _usernameController.text = user.username;
-          _phoneController.text = user.phone;
-          _addressController.text = user.address;
-          _emailController.text = user.email;
+          _usernameController.text = user['username'];
+          _phoneController.text = user["phone"];
+          _addressController.text = user["address"];
+          _emailController.text = user["email"];
           _isLoading = false;
         });
       } else {
@@ -265,13 +269,14 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     if (_currentUser == null) return;
 
     final updatedUser = UserModel(
-      id: _currentUser!.id,
+      id: _currentUser!["user_id"],
       username: _usernameController.text.trim(),
       email: _emailController.text.trim(),
       phone: _phoneController.text.trim(),
       address: _addressController.text.trim(),
-      role: _currentUser!.role,
+      role: _currentUser!["role"],
     );
+    DatabaseHelper().updateUser(updatedUser);
 
     showDialog(
       context: context,
@@ -283,9 +288,11 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       Navigator.pop(context); // Tutup loading dialog
 
       if (success) {
-        await AuthService().saveUserToPrefs(updatedUser);
+        // await AuthService().saveUserToPrefs(updatedUser);
+        final user = await Sessionn.user();
+
         setState(() {
-          _currentUser = updatedUser; // Update state agar UI terupdate
+          _currentUser = user; // Update state agar UI terupdate
         });
         _showSuccessDialog();
       } else {
