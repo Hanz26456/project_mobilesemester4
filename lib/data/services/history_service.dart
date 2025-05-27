@@ -12,6 +12,7 @@ Future<List<OrderResponse>> fetchUserOrders(int userId) async {
 
   if (response.statusCode == 200) {
     final jsonData = json.decode(response.body);
+    print('Response data: $jsonData'); // Debugging line
     final List<dynamic> orders = jsonData['data'];
     return orders.map((e) => OrderResponse.fromJson(e)).toList();
   } else {

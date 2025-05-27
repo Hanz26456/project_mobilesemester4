@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:home_service/data/services/database.dart';
+import 'package:home_service/data/services/session.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,7 +54,6 @@ class AuthService {
       if (response.statusCode == 200) {
         final token = data['token'];
         final user = UserModel.fromJson(data['user']);
-        print("sada ${user.toJson()}");
         UserModel dataa = UserModel(
           id: user.id,
           username: user.username,
@@ -64,6 +64,8 @@ class AuthService {
           photo: user.photo,
           token: token,
         );
+        // print("sada token${dataa.toJson()}");
+
 
         await DatabaseHelper().insertUser(dataa);
         // final prefs = await SharedPreferences.getInstance();
@@ -171,9 +173,9 @@ class AuthService {
   }
 
   Future<bool> updateUserProfile(UserModel user) async {
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
+    final data = await Sessionn.user();
+    final token = data;
+    print(token);
     if (token == null) {
       print('Token tidak ditemukan. Pengguna belum login.');
       return false;
@@ -183,7 +185,6 @@ class AuthService {
       '${Config.baseUrl}/profile/update',
     ); // Ganti dengan endpoint yang sesuai
     final body = json.encode(user.toJson()); // Pastikan menggunakan toJson()
-
     try {
       final response = await http.put(
         url,
@@ -193,6 +194,9 @@ class AuthService {
         },
         body: body,
       );
+      print('Mengirim data profil: $response.body');
+      print('Mengirim data profil: $response.statusCode'); // Debugging line
+      // Debugging line
 
       if (response.statusCode == 200) {
         print('Profil berhasil diperbarui');

@@ -23,24 +23,22 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void loadUserAndFetch() async {
-    final user = await Sessionn.user();
-    // final prefs = await SharedPreferences.getInstance();
-    final token = user['token'];
-    final savedUserId = user['user_id'];
-    print('✅ user_id dari SharedPreferences: $savedUserId');
+  final user = await Sessionn.user();
+  final token = user['token'];
+  final savedUserId = user['user_id'];
 
-    if (savedUserId != null) {
-      setState(() {
-        userId = savedUserId;
-        futureOrders = fetchUserOrders(savedUserId).catchError((e) {
-          print('❌ Error fetchUserOrders: $e');
-          return <OrderResponse>[];
-        });
+  if (savedUserId != null) {
+    setState(() {
+      userId = savedUserId;
+      futureOrders = fetchUserOrders(savedUserId).catchError((e) {
+        print('❌ Error fetchUserOrders: $e');
+        return <OrderResponse>[];
       });
-    } else {
-      print('⚠️ user_id masih null');
-    }
+    });
+  } else {
+    print('⚠️ user_id masih null');
   }
+}
 
   @override
   Widget build(BuildContext context) {

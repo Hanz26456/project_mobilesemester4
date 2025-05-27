@@ -18,6 +18,7 @@ class Sessionn {
     }
 
     final user = userList.first;
+    print(user);
     return {
       'user_id': user.id,
       'email': user.email,
@@ -25,8 +26,8 @@ class Sessionn {
       'address': user.address,
       'role': user.role,
       'phone': user.phone,
+      'token': user.token,
       'photo': user.photo ?? '',
-      'token': user.token ?? '',
     };
   }
 }

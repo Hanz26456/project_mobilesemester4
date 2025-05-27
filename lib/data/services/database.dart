@@ -47,7 +47,7 @@ class DatabaseHelper {
       'address': user.address,
       'role': user.role,
       'photo': user.photo ?? '',
-      'token': user.token ?? '',
+      'token': user.token,
     }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
@@ -79,7 +79,7 @@ class DatabaseHelper {
         'address': user.address,
         'role': user.role,
         'photo': user.photo ?? '',
-        'token': user.token ?? '',
+        'token': user.token,
       },
       where: 'id = ?',
       whereArgs: [user.id],

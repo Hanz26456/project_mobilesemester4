@@ -1,8 +1,8 @@
 class Config {
-  static const String baseUrl ="http://192.168.100.205:8000/api";
-  static const String fileBaseUrl = "http://192.168.100.205:8000"; // Pastikan URL benar
+  static const String baseUrl ="https://webfw23.myhost.id/gol_bws1/api";
+  static const String fileBaseUrl ="https://webfw23.myhost.id/gol_bws1/public/"; // Pastikan URL benar
 
  static String getProfilePhotoUrl(String filename) {
     return '$fileBaseUrl$filename';
 }
-} 
+}  

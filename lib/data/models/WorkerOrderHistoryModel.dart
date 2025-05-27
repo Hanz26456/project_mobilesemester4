@@ -23,15 +23,19 @@ class WorkerOrderHistory {
 
   factory WorkerOrderHistory.fromJson(Map<String, dynamic> json) {
     return WorkerOrderHistory(
-      id: json['id'],
-      userId: json['user_id'],
-      workerId: json['worker_id'] != null ? json['worker_id'] as int : null,
-      totalPembayaran: json['total_pembayaran'],
-      kembalian: json['kembalian'],
+      id: int.parse(json['id'].toString()),
+      userId: int.parse(json['user_id'].toString()),
+      workerId:
+          json['worker_id'] != null
+              ? int.parse(json['worker_id'].toString())
+              : null,
+      totalPembayaran: int.parse(json['total_pembayaran'].toString()),
+      kembalian: int.parse(json['kembalian'].toString()),
       tanggalPemesanan: json['tanggal_pemesanan'],
       status: json['status'],
       metodePembayaran: json['metode_pembayaran'],
-      orderDetails: (json['order_details'] as List<dynamic>?)
+      orderDetails:
+          (json['order_details'] as List<dynamic>?)
               ?.map((e) => OrderDetail.fromJson(e))
               .toList() ??
           [],
@@ -60,21 +64,22 @@ class OrderDetail {
 
   factory OrderDetail.fromJson(Map<String, dynamic> json) {
     return OrderDetail(
-      idOrderDetail: json['id_order_detail'],
-      idOrders: json['id_orders'],
-      serviceId: json['service_id'],
-      quantity: json['quantity'],
-      price: json['price'],
-      subtotal: json['subtotal'],
-      service: json['service'] != null
-          ? Service.fromJson(json['service'])
-          : Service(
-              id: 0,
-              name: 'Unknown',
-              description: '',
-              price: '0',
-              image: null,
-            ),
+      idOrderDetail: int.parse(json['id_order_detail'].toString()),
+      idOrders: int.parse(json['id_orders'].toString()),
+      serviceId: int.parse(json['service_id'].toString()),
+      quantity: int.parse(json['quantity'].toString()),
+      price: int.parse(json['price'].toString()),
+      subtotal: int.parse(json['subtotal'].toString()),
+      service:
+          json['service'] != null
+              ? Service.fromJson(json['service'])
+              : Service(
+                id: 0,
+                name: 'Unknown',
+                description: '',
+                price: '0',
+                image: null,
+              ),
     );
   }
 }

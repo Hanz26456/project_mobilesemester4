@@ -47,14 +47,15 @@ class OrderDetailResponse {
   });
 
   factory OrderDetailResponse.fromJson(Map<String, dynamic> json) {
-    return OrderDetailResponse(
-      serviceId: json['service_id'],
-      quantity: json['quantity'],
-      price: json['price'],
-      subtotal: json['subtotal'],
-      service: Service.fromJson(json['service']),
-    );
-  }
+  return OrderDetailResponse(
+    serviceId: int.parse(json['service_id']), // ← perbaikan di sini
+    quantity: int.parse(json['quantity']),
+    price: int.parse(json['price']),
+    subtotal: int.parse(json['subtotal']),
+    service: Service.fromJson(json['service']),
+  );
+}
+
 
   @override
   String toString() {
